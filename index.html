@@ -1,14 +1,16 @@
 <!DOCTYPE html>
 <html>
+
 <head lang="en">
     <meta charset="UTF-8">
-    <script src = "node_modules/d3/dist/d3.js"></script>
-    <link rel="stylesheet" href="css/style.css"/>
+    <script src="node_modules/d3/dist/d3.js"></script>
+    <link rel="stylesheet" href="css/style.css" />
     <title>InfoVizProject</title>
 </head>
+
 <body>
     <div id="container" align="center" style="width:1000px;margin-left: auto;margin-right: auto;margin-top:50px">
-        <div style="align-content: center; float:left; width:400px;height:300px" class="campaigncontainer">
+        <div class="campaigncontainer">
             <h2>Campaign Index</h2>
             <table style="width:100%; text-align: center">
                 <tr>
@@ -26,36 +28,88 @@
                     <td>08.06.2018</td>
                     <td>Blue</td>
                 </tr>
+                <tr>
+                    <td>Campaign3</td>
+                    <td>08.06.2018</td>
+                    <td>Blue</td>
+                </tr>
+                <tr>
+                    <td>Campaign4</td>
+                    <td>08.06.2018</td>
+                    <td>Blue</td>
+                </tr>
+                <tr>
+                    <td>Campaign5</td>
+                    <td>08.06.2018</td>
+                    <td>Blue</td>
+                </tr>
+                <tr>
+                    <td>Campaign6</td>
+                    <td>08.06.2018</td>
+                    <td>Blue</td>
+                </tr>
+                <tr>
+                    <td>Campaign7</td>
+                    <td>08.06.2018</td>
+                    <td>Blue</td>
+                </tr>
+                <tr>
+                    <td>Campaign8</td>
+                    <td>08.06.2018</td>
+                    <td>Blue</td>
+                </tr>
+                <tr>
+                    <td>Campaign9</td>
+                    <td>08.06.2018</td>
+                    <td>Blue</td>
+                </tr>
+                <tr>
+                    <td>Campaign10</td>
+                    <td>08.06.2018</td>
+                    <td>Blue</td>
+                </tr>
+                <tr>
+                    <td>Campaign11</td>
+                    <td>08.06.2018</td>
+                    <td>Blue</td>
+                </tr>
             </table>
         </div>
-        <div width="400" style="align-content: center; float:left; width:600px;"  class="viscontainer">
+        <div class="viscontainer big">
             <h2>Sending Timeline</h2>
-            <p>Click to select campaigns for comparison.<br>Hover for more information.</p>
+            <p>Click to select campaigns for comparison.
+                <br />Hover for more information.</p>
             <div id="chart_timeline"></div>
         </div>
         <div style="clear: both;"></div>
-        <div width="200" style="align-content: center; float:left; width:400px;height:300px" class="intro">
+        <div class="intro">
             <h1>Newsletter Visualization</h1>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam sed scelerisque turpis, et tempus magna. Quisque eget cursus nulla, sit amet gravida ex. Vestibulum maximus magna mauris, dictum aliquam metus consequat a. Sed vel consequat felis. Nunc non erat nisi. Cras magna magna, dignissim sit amet placerat luctus, fringilla quis lectus. Quisque risus elit, sodales vitae arcu at, maximus imperdiet sapien. Suspendisse pellentesque maximus felis. Donec dapibus ex vitae urna aliquet consequat. Nullam pellentesque lacinia arcu at sodales. Integer imperdiet maximus pulvinar. Vivamus a ullamcorper ligula. Duis a libero sagittis ante suscipit ornare. Nullam gravida euismod arcu, in placerat magna dignissim sit amet.</p>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam sed scelerisque turpis, et tempus magna. Quisque
+                eget cursus nulla, sit amet gravida ex. Vestibulum maximus magna mauris, dictum aliquam metus consequat a.
+                Sed vel consequat felis. Nunc non erat nisi. Cras magna magna, dignissim sit amet placerat luctus, fringilla
+                quis lectus. Quisque risus elit, sodales vitae arcu at, maximus imperdiet sapien. Suspendisse pellentesque
+                maximus felis. Donec dapibus ex vitae urna aliquet consequat. Nullam pellentesque lacinia arcu at sodales.
+                Integer imperdiet maximus pulvinar. Vivamus a ullamcorper ligula. Duis a libero sagittis ante suscipit ornare.
+                Nullam gravida euismod arcu, in placerat magna dignissim sit amet.</p>
         </div>
-        <div width="400" style="align-content: center; float:left; width: 600px;" class="viscontainer">
-             <h2>Performance Indicators</h2>
-             <p>Performance comparison of the selected newsletters.<br>Hover for more information.</p>
-             <div id="chart_performance"></div>
+        <div class="viscontainer big">
+            <h2>Performance Indicators</h2>
+            <p>Performance comparison of the selected newsletters.
+                <br />Hover for more information.</p>
+            <div id="chart_performance"></div>
         </div>
         <div style="clear: both;"></div>
-        <div align="left" style="width:auto;position: relative;align-content: center; margin-top: 20px" >
-                <div style="margin-top: 0px">&nbsp;</div>
+        <div align="left" style="width:auto;position: relative;align-content: center; margin-top: 20px;height:400px">
+            <div style="margin-top: 0px">&nbsp;</div>
             <div style="width:400px;align-content: center;text-align: center; top:0px; position: absolute" class="viscontainer">
-                    <h2>Location of Recipients</h2>
-                    <p>Mapping of locations and number of recipients.<br>Hover for more information.</p>
-                </div>
-            <div align="center" style="width: 600px; margin-left:auto;margin-right: auto; margin-top: 50px">
-                    <img src="at.svg" alt="Autria map" width="600px">
+                <h2>Location of Recipients</h2>
+                <p>Mapping of locations and number of recipients.
+                    <br>Hover for more information.</p>
             </div>
-            
+            <div id="chart_location" style="width: 600px; margin-left:auto;margin-right: auto; margin-top: 50px; height:350px"></div>
         </div>
     </div>
     <script src="js/index.js"></script>
 </body>
-</html> 
+
+</html>

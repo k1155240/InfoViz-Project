@@ -1,6 +1,8 @@
 /**/
 .intro {
-    margin-top: -10px
+    margin-top: -10px;
+    width:400px;
+    height:300px;
 }
 .intro p {
     text-align: justify !important;
@@ -11,14 +13,19 @@
     margin-bottom: 25px;
 }
 
-.viscontainer h2 {
+.viscontainer, .campaigncontainer, .intro {
+    align-content: center;
+    float:left;
+}
+
+.viscontainer h2, .campaigncontainer h2 {
     font-family: Georgia, 'Times New Roman', Times, serif;
     font-size:20px;
     text-decoration: underline;
     margin-bottom: 25px;
 }
 
-.viscontainer p, .intro p {
+.viscontainer p, .intro p, .campaigncontainer table {
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     font-size: 14px;
     color: #808080;
@@ -26,11 +33,24 @@
 
 .axis .domain {
     display: none;
-  }
+ }
+
+ .campaigncontainer {
+     height: 350px;
+     width:400px;
+ }
+
+ .campaigncontainer table {
+     color: black;
+ }
 
 .campaigncontainer th {
-    padding-bottom: 20px;
+    padding-bottom: 15px;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     font-weight: normal;
-    font-size: 14px
+    font-size: 14px;
+}
+
+.big {
+    width: 600px
 }
