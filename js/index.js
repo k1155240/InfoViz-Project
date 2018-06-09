@@ -98,7 +98,7 @@
     }).then(function (data) {
         var keys = data.columns.slice(1);
 
-        y0.domain(keys)
+        y0.domain(keys);
         y1.domain(data.map(function (d) { return d.Campaign; })).rangeRound([0, y0.bandwidth()]);
 
         x.domain([0, d3.max(data, function (d) { return d3.max(keys, function (key) { return d[key]; }); })]).nice();
@@ -147,8 +147,70 @@
 (function (selector) {
     var svg = d3.select(selector).append("svg");
     svg.attr("width", 600);
-    svg.attr("height", "auto");
+    svg.attr("height", 350);
     svg.append("image")
     .attr("xlink:href", "at.svg")
     .attr("width", 600)
+
+    var margin = { top: 0, right: 0, bottom: 0, left: 0 },
+        width = +svg.attr("width") - margin.left - margin.right,
+        height = +svg.attr("height") - margin.top - margin.bottom,
+        g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    var keys = ["value"];
+
+    var data = [
+        {Campaign: "Campaign1", value:10, state:"V"},
+        {Campaign: "Campaign2", value:20, state:"V"},
+        {Campaign: "Campaign1", value:20, state:"UA"},
+        {Campaign: "Campaign2", value:10, state:"UA"},
+        {Campaign: "Campaign1", value:30, state:"LA"},
+        {Campaign: "Campaign2", value:20, state:"LA"},
+        {Campaign: "Campaign1", value:30, state:"S"},
+        {Campaign: "Campaign2", value:20, state:"S"},
+        {Campaign: "Campaign1", value:30, state:"T"},
+        {Campaign: "Campaign2", value:20, state:"T"},
+        {Campaign: "Campaign1", value:50, state:"Vo"},
+        {Campaign: "Campaign2", value:20, state:"Vo"},
+        {Campaign: "Campaign1", value:30, state:"K"},
+        {Campaign: "Campaign2", value:20, state:"K"},
+        {Campaign: "Campaign1", value:30, state:"St"},
+        {Campaign: "Campaign2", value:20, state:"St"},
+        {Campaign: "Campaign1", value:30, state:"B"},
+        {Campaign: "Campaign2", value:20, state:"B"},
+    ]
+    
+    var x0 = d3.scaleOrdinal()
+        .domain(["V", "LA", "UA", "S", "T", "Vo", "K", "St", "B"])
+        .range([525, 465, 360, 270, 130, 10, 370, 450,560]);
+
+    var x = d3.scaleBand()
+        .padding(0.1)
+        .domain(data.map(function (d) { return d.Campaign; }))
+        .rangeRound([0, width/20]);
+    
+    var y0 = d3.scaleOrdinal()
+        .domain(["V", "LA", "UA", "S", "T", "Vo", "K", "St", "B"])
+        .range([25, 20, 15, 75, 140, 120, 210, 160, 70]);
+
+    var y = d3.scaleLinear()
+        .rangeRound([height/5, 0])
+        .domain([0, d3.max(data, function (d) { return d3.max(keys, function (key) { return d[key]; }); })])
+        .nice();
+    var z = d3.scaleOrdinal()
+        .range(["#f7f296", "#8d91bb"]);
+
+    g.append("g")
+        .selectAll("g")
+        .data(data)
+        .enter().append("g")
+        .attr("transform", function (d) { return "translate(" + x(d.Campaign) + ",0)"; })
+        .selectAll("rect")
+        .data(function (d) { return keys.map(function (key) { return { key: key, value: d[key], campaign: d.Campaign, state: d.state }; }); })
+        .enter().append("rect")
+        .attr("x", function(d) { return x0(d.state); })
+        .attr("y", function (d) { return y0(d.state) + y(d.value); })
+        .attr("width", x.bandwidth())
+        .attr("height", function (d) { return height/5 - y(d.value); })
+        .attr("fill", function (d) { return z(d.campaign); });
 })("#chart_location");
