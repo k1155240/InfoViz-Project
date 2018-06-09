@@ -1,1 +1,36 @@
 /**/
+.intro {
+    margin-top: -10px
+}
+.intro p {
+    text-align: justify !important;
+}
+.intro h1 {
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    font-size:30px;
+    margin-bottom: 25px;
+}
+
+.viscontainer h2 {
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    font-size:20px;
+    text-decoration: underline;
+    margin-bottom: 25px;
+}
+
+.viscontainer p, .intro p {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 14px;
+    color: #808080;
+}
+
+.axis .domain {
+    display: none;
+  }
+
+.campaigncontainer th {
+    padding-bottom: 20px;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-weight: normal;
+    font-size: 14px
+}
