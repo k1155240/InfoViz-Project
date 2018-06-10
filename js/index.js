@@ -1,70 +1,56 @@
 (function (selector) {
     var svg = d3.select(selector).append("svg");
+    svg.attr("width", 450);
+    svg.attr("height", 200);
+    svg = svg.append("g").attr("transform", "translate(" + 5 + "," + 5 + ")");
 
-    var pie = d3.pie()
-        .value(function (d) { return d.count })
-
-    var sales = [
-        { product: 'Hoodie', count: 12 },
-        { product: 'Jacket', count: 7 },
-        { product: 'Snuggie', count: 6 },
-    ];
-
-    var slices = pie(sales);
-    // the result looks roughly like this:
-    [
-        {
-            data: sales[0],
-            endAngle: 3.0159289474462017,
-            startAngle: 0,
-            value: 12
-        },
-        {
-            data: sales[1],
-            startAngle: 3.0159289474462017,
-            endAngle: 4.775220833456486,
-            value: 7
-        },
-        {
-            data: sales[2],
-            startAngle: 4.775220833456486,
-            endAngle: 6.283185307179587,
-            value: 6
-        }
+    var data = [
+        {Campaign: "Campaign1", senddate:new Date('2018-06-05T03:24:00')},
+        {Campaign: "Campaign2", senddate:new Date('2018-06-05T03:26:00')},
+        {Campaign: "Campaign3", senddate:new Date('2018-06-06T03:27:00')},
+        {Campaign: "Campaign4", senddate:new Date('2018-06-06T03:28:00')},
+        {Campaign: "Campaign5", senddate:new Date('2018-06-06T03:29:00')},
+        {Campaign: "Campaign6", senddate:new Date('2018-06-07T03:24:00')},
+        {Campaign: "Campaign7", senddate:new Date('2018-06-08T03:24:00')},
+        {Campaign: "Campaign8", senddate:new Date('2018-06-08T03:24:00')},
+        {Campaign: "Campaign9", senddate:new Date('2018-06-08T03:24:00')},
+        {Campaign: "Campaign10", senddate:new Date('2018-06-09T03:24:00')},
+        {Campaign: "Campaign11", senddate:new Date('2018-06-09T03:24:00')}
     ]
 
-    var arc = d3.arc()
-        .innerRadius(0)
-        .outerRadius(50);
+    var width = 440;
+    var x = d3.scaleBand()
+        .rangeRound([0, 200])
+        .paddingInner(0.1)
+        .domain(data.map(function(d){return d.senddate.setHours(0,0,0,0) }));
 
-    // helper that returns a color based on an ID
-    var color = d3.scaleOrdinal(d3.schemeCategory10);
+    var x1 = d3.scaleBand()
+        .padding(0.05)
+        .domain(data.map(function (d) { return d.Campaign; })).rangeRound([0, x.bandwidth()]);
+    
+    svg.append("g").append("rect")
+        .attr("x", 0)
+        .attr("y", 0)
+        .attr("width", width)
+        .attr("height", 100)
+        .style("stroke", "black")
+        .style("stroke-width", 1)
+        .style("fill", "none");
+           
+    svg.append("g")
+        .selectAll("g")
+        .data(data)
+        .enter().append("g")
+        .attr("transform", function (d) { return "translate(" + x(d.senddate.setHours(0,0,0,0)) + ",0)"; })
+        .selectAll("rect")
+        .data(function (d) { return [d] })
+        .enter().append("rect")
+        .attr("x",10)
+        .attr("y", 0)
+        .attr("width", 10)
+        .attr("height", 100)
+        .attr("fill", "black");
 
-    var g = svg.append('g')
-        .attr('transform', 'translate(200, 50)')
-
-    g.selectAll('path.slice')
-        .data(slices)
-        .enter()
-        .append('path')
-        .attr('class', 'slice')
-        .attr('d', arc)
-        .attr('fill', function (d) {
-            return color(d.data.product);
-        });
-
-    // building a legend is as simple as binding
-    // more elements to the same data. in this case,
-    // <text> tags
-    svg.append('g')
-        .attr('class', 'legend')
-        .selectAll('text')
-        .data(slices)
-        .enter()
-        .append('text')
-        .text(function (d) { return '• ' + d.data.product; })
-        .attr('fill', function (d) { return color(d.data.product); })
-        .attr('y', function (d, i) { return 20 * (i + 1); })
 })("#chart_timeline");
 
 (function (selector) {
@@ -148,9 +134,17 @@
     var svg = d3.select(selector).append("svg");
     svg.attr("width", 600);
     svg.attr("height", 350);
-    svg.append("image")
+    svg.attr("viewBox", "0 0 600 350");
+
+    var imagesvg = svg.append("svg"); 
+    imagesvg.attr("viewBox", "0 0 1000 514");
+    imagesvg.attr("width", "100%");
+    imagesvg.attr("preserveAspectRatio", "xMidYMin meet");
+
+    imagesvg.append("image")
+    .attr("preserveAspectRatio", "xMidYMid meet")
     .attr("xlink:href", "at.svg")
-    .attr("width", 600)
+    .attr("width", 1000).attr("height", 514);
 
     var margin = { top: 0, right: 0, bottom: 0, left: 0 },
         width = +svg.attr("width") - margin.left - margin.right,
