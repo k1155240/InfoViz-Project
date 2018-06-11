@@ -1,3 +1,33 @@
+function drawTable(selector, data, update) {
+    var table = d3.select(selector).append('table').attr();
+    var thead = table.append('thead');
+    var	tbody = table.append('tbody');
+
+    // append the header row
+    thead.append('tr')
+        .selectAll('th')
+        .data(["Id", "Send time", "Color"]).enter()
+        .append('th')
+        .text(function (column) { return column; });
+
+    // create a row for each object in the data
+    var rows = tbody.selectAll('tr')
+        .data(data)
+        .enter()
+        .append('tr');
+
+    // create a cell in each row for each column
+    var cells = rows.selectAll('td')
+        .data(function (row) {
+        return columns.map(function (column) {
+            return {column: column, value: row[column]};
+        });
+        })
+        .enter()
+        .append('td')
+        .text(function (d) { return d.value; });
+}
+
 (function (selector) {
     var svg = d3.select(selector).append("svg");
     svg.attr("width", 450);
@@ -154,7 +184,6 @@ function drawMap(selector, data, update) {
         .attr("width", 1000).attr("height", 514);
     }
     
-
     var margin = { top: 0, right: 0, bottom: 0, left: 0 },
         width = +svg.attr("width") - margin.left - margin.right,
         height = +svg.attr("height") - margin.top - margin.bottom;
@@ -165,7 +194,7 @@ function drawMap(selector, data, update) {
         g = svg.select("g").select("g");
     }
     else {
-            g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")").append("g");
+        g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")").append("g");
     }
 
     var keys = ["value"];
