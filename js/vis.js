@@ -101,7 +101,8 @@
             .attr("y", function (d) { return y0(d.key); })
             .attr("width", function (d) { return width - x(d.value); })
             .attr("height", y1.bandwidth())
-            .attr("fill", function (d) { return z(d.campaign); });
+            .attr("fill", function (d) { return z(d.campaign); })
+            .on("click", function(d){updateMap();});
 
         g.append("g")
             .attr("class", "axis")
@@ -130,50 +131,45 @@
     });
 })("#chart_performance");
 
-(function (selector) {
-    var svg = d3.select(selector).append("svg");
-    svg.attr("width", 600);
-    svg.attr("height", 350);
-    svg.attr("viewBox", "0 0 600 350");
+function drawMap(selector, data, update) {
+    var svg;
 
-    var imagesvg = svg.append("svg"); 
-    imagesvg.attr("viewBox", "0 0 1000 514");
-    imagesvg.attr("width", "100%");
-    imagesvg.attr("preserveAspectRatio", "xMidYMin meet");
+    if(update) {
+        svg = d3.select(selector).select("svg");
+    }
+    else {
+        svg = d3.select(selector).append("svg");
+        svg.attr("width", 600);
+        svg.attr("height", 350);
+        svg.attr("viewBox", "0 0 600 350");
 
-    imagesvg.append("image")
-    .attr("preserveAspectRatio", "xMidYMid meet")
-    .attr("xlink:href", "at.svg")
-    .attr("width", 1000).attr("height", 514);
+        var imagesvg = svg.append("svg"); 
+        imagesvg.attr("viewBox", "0 0 1000 514");
+        imagesvg.attr("width", "100%");
+        imagesvg.attr("preserveAspectRatio", "xMidYMin meet");
+
+        imagesvg.append("image")
+        .attr("preserveAspectRatio", "xMidYMid meet")
+        .attr("xlink:href", "at.svg")
+        .attr("width", 1000).attr("height", 514);
+    }
+    
 
     var margin = { top: 0, right: 0, bottom: 0, left: 0 },
         width = +svg.attr("width") - margin.left - margin.right,
-        height = +svg.attr("height") - margin.top - margin.bottom,
-        g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        height = +svg.attr("height") - margin.top - margin.bottom;
+    
+    var g;
+
+    if(update) {
+        g = svg.select("g").select("g");
+    }
+    else {
+            g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")").append("g");
+    }
 
     var keys = ["value"];
 
-    var data = [
-        {Campaign: "Campaign1", value:10, state:"V"},
-        {Campaign: "Campaign2", value:20, state:"V"},
-        {Campaign: "Campaign1", value:20, state:"UA"},
-        {Campaign: "Campaign2", value:10, state:"UA"},
-        {Campaign: "Campaign1", value:30, state:"LA"},
-        {Campaign: "Campaign2", value:20, state:"LA"},
-        {Campaign: "Campaign1", value:30, state:"S"},
-        {Campaign: "Campaign2", value:20, state:"S"},
-        {Campaign: "Campaign1", value:30, state:"T"},
-        {Campaign: "Campaign2", value:20, state:"T"},
-        {Campaign: "Campaign1", value:50, state:"Vo"},
-        {Campaign: "Campaign2", value:20, state:"Vo"},
-        {Campaign: "Campaign1", value:30, state:"K"},
-        {Campaign: "Campaign2", value:20, state:"K"},
-        {Campaign: "Campaign1", value:30, state:"St"},
-        {Campaign: "Campaign2", value:20, state:"St"},
-        {Campaign: "Campaign1", value:30, state:"B"},
-        {Campaign: "Campaign2", value:20, state:"B"},
-    ]
-    
     var x0 = d3.scaleOrdinal()
         .domain(["V", "LA", "UA", "S", "T", "Vo", "K", "St", "B"])
         .range([525, 465, 360, 270, 130, 10, 370, 450,560]);
@@ -194,8 +190,8 @@
     var z = d3.scaleOrdinal()
         .range(["#f7f296", "#8d91bb"]);
 
-    g.append("g")
-        .selectAll("g")
+    g.selectAll("g").remove();
+    g.selectAll("g")
         .data(data)
         .enter().append("g")
         .attr("transform", function (d) { return "translate(" + x(d.Campaign) + ",0)"; })
@@ -206,5 +202,30 @@
         .attr("y", function (d) { return y0(d.state) + y(d.value); })
         .attr("width", x.bandwidth())
         .attr("height", function (d) { return height/5 - y(d.value); })
-        .attr("fill", function (d) { return z(d.campaign); });
-})("#chart_location");
+        .attr("fill", function (d) { return z(d.campaign); })
+        .transition(500);
+}
+
+function updateMap() {
+    var data = [
+        {Campaign: "Campaign1", value:20, state:"V"},
+        {Campaign: "Campaign2", value:10, state:"V"},
+        {Campaign: "Campaign1", value:40, state:"UA"},
+        {Campaign: "Campaign2", value:10, state:"UA"},
+        {Campaign: "Campaign1", value:30, state:"LA"},
+        {Campaign: "Campaign2", value:40, state:"LA"},
+        {Campaign: "Campaign1", value:30, state:"S"},
+        {Campaign: "Campaign2", value:40, state:"S"},
+        {Campaign: "Campaign1", value:30, state:"T"},
+        {Campaign: "Campaign2", value:40, state:"T"},
+        {Campaign: "Campaign1", value:50, state:"Vo"},
+        {Campaign: "Campaign2", value:40, state:"Vo"},
+        {Campaign: "Campaign1", value:30, state:"K"},
+        {Campaign: "Campaign2", value:80, state:"K"},
+        {Campaign: "Campaign1", value:30, state:"St"},
+        {Campaign: "Campaign2", value:40, state:"St"},
+        {Campaign: "Campaign1", value:30, state:"B"},
+        {Campaign: "Campaign2", value:40, state:"B"},
+    ]
+    drawMap("#chart_location", data, true);
+}
