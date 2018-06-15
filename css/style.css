@@ -51,6 +51,11 @@
     font-size: 14px;
 }
 
+.campaigncontainer td {
+    padding: 0 15px 0 15px;
+}
+
+
 .big {
     width: 600px
 }

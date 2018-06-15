@@ -1,24 +1,57 @@
+var selectedCampaigns = [];
+var selectedMapDataType = "Open Rate";
+
+function updateTable(selector) {
+    var color = d3.scaleOrdinal()
+        .range(["#f7f296", "#8d91bb"]);
+
+    d3.select(selector)
+        .select('table')
+        .selectAll('tr.data')
+        .transition()
+        .style("background-color", function(d, i) { 
+            var id = d3.select(this).attr("data-id");
+            return id !== null && selectedCampaigns.includes(id) ? color(id) : "" ;});
+}
+
+function selectCampaign(d, selector) {
+    if(selectedCampaigns.includes(d["Id"])) {
+        selectedCampaigns.splice(selectedCampaigns.indexOf(d["Id"]), 1);
+    }
+    else if (selectedCampaigns.length < 2) {
+        selectedCampaigns.push(d["Id"]);
+    }
+
+    updateTable(selector);
+    addMapData();
+    updateBars();
+}
+
 function drawTable(selector, data) {
     var table = d3.select(selector).append('table');
-
-    var columns = ["Id", "Send date", "Color"];
+    
+    var columns = ["Name", "Send date"];
     // append the header row
     table.append('tr')
         .selectAll('th')
-        .data(columns).enter()
+        .data(columns)
+        .enter()
         .append('th')
         .text(function (column) { return column; });
 
     // create a row for each object in the data
-    var rows = table.selectAll('tr')
+    var rows = table.selectAll('tr.data')
         .data(data)
         .enter()
-        .append('tr');
+        .append('tr')
+        .attr("data-id", function(d) {return  d["Id"];})
+        .on("click", function(d) { selectCampaign(d, selector)})
+        .classed("data", true);
 
     // create a cell in each row for each column
     var cells = rows.selectAll('td')
         .data(function (row) {
-            return [row["Id"], row["Send date"].format("YYYY-mm-DD hh:mm")]
+            return [row["Name"], row["Send date"].format("YYYY-mm-DD hh:mm")]
         })
         .enter()
         .append('td')
@@ -80,122 +113,145 @@ function drawTable(selector, data) {
 
 })("#chart_timeline");
 
-(function (selector) {
-    var svg = d3.select(selector).append("svg");
+function updateBars() {
+    var id1 = selectedCampaigns[0];
+    var id2 = selectedCampaigns[1];
+
+    var data = metaData.filter(function(md){ return md.CampaignID == id1 || md.CampaignID == id2})
+        .map(function(m) { 
+            return {
+                Campaign: m["Name"],
+                "Open Rate": openings
+                    .filter(function(d){ return d.key == m.CampaignID}).map(function(d) { 
+                        return d3.sum(d.values, function(d2){ return d2.value; })
+                    })[0],
+                "Click Rate": clicks
+                    .filter(function(d){ return d.key == m.CampaignID}).map(function(d) { 
+                        return d3.sum(d.values, function(d2){ return d2.value; })
+                    })[0],
+                "Reading Duration": readTime
+                    .filter(function(d){ return d.key == m.CampaignID}).map(function(d) { 
+                        return d.value
+                    })[0]
+            }
+        });
+    
+    var svg = d3.select("#chart_performance").select("svg");
+    var margin = { top: 20, right: 20, bottom: 30, left: 100 },
+        width = +svg.attr("width") - margin.left - margin.right,
+        height = +svg.attr("height") - margin.top - margin.bottom,
+        g = svg.select("g");
+
+    var y0 = d3.scaleBand()
+        .rangeRound([0, height])
+        .paddingInner(0.1);
+    var y1 = d3.scaleBand()
+        .padding(0.05);
+    var x = d3.scaleLinear()
+        .rangeRound([width, 0]);
+    var z = d3.scaleOrdinal()
+        .range(["#f7f296", "#8d91bb"]);
+
+    var keys = ["Open Rate", "Click Rate", "Reading Duration"];
+
+    y0.domain(keys);
+    y1.domain(data.map(function (d) { return d.Campaign; })).rangeRound([0, y0.bandwidth()]);
+
+    x.domain([0, d3.max(data, function (d) { return d3.max(keys, function (key) { return d[key]; }); })]).nice();
+
+    g.selectAll("g").remove();
+    g.append("g")
+        .selectAll("g")
+        .data(data)
+        .enter().append("g")
+        .attr("transform", function (d) { return "translate(0," + y1(d.Campaign) + ")"; })
+        .selectAll("rect")
+        .data(function (d) { return keys.map(function (key) { return { key: key, value: d[key], campaign: d.Campaign }; }); })
+        .enter().append("rect")
+        .attr("x", 0)
+        .attr("y", function (d) { return y0(d.key); })
+        .attr("width", function (d) { return width - x(d.value); })
+        .attr("height", y1.bandwidth())
+        .attr("fill", function (d) { return z(d.campaign); })
+        .on("click", function(d){ selectedMapDataType = d.key; addMapData();});
+
+    g.append("g")
+        .attr("class", "axis")
+        .call(d3.axisLeft(y0));
+
+    var legend = g.append("g")
+        .attr("font-family", "sans-serif")
+        .attr("font-size", 10)
+        .attr("text-anchor", "end")
+        .selectAll("g")
+        .data(data.map(function (d) { return d.Campaign; }))
+        .enter().append("g")
+        .attr("transform", function (d, i) { return "translate(0," + i * 20 + ")"; });
+
+    legend.append("rect")
+        .attr("x", width - 19)
+        .attr("width", 19)
+        .attr("height", 19)
+        .attr("fill", z);
+
+    legend.append("text")
+        .attr("x", width - 24)
+        .attr("y", 12)
+        .attr("dy", "0.32em")
+        .text(function (d) { return d; });
+}
+
+function drawBars() {
+    var svg = d3.select("#chart_performance").append("svg");
     svg.attr("width", 400);
     svg.attr("height", 200);
     var margin = { top: 20, right: 20, bottom: 30, left: 100 },
         width = +svg.attr("width") - margin.left - margin.right,
         height = +svg.attr("height") - margin.top - margin.bottom,
         g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+};
 
-    var y0 = d3.scaleBand()
-        .rangeRound([0, height])
-        .paddingInner(0.1);
+function addMapData() {
+    var data = [];
+    var filtered;
 
-    var y1 = d3.scaleBand()
-        .padding(0.05);
+    var id1 = selectedCampaigns[0];
+    var id2 = selectedCampaigns[1];
 
-    var x = d3.scaleLinear()
-        .rangeRound([width, 0]);
+    if(selectedMapDataType == "Open Rate") {
+        filtered = openings;
+    }
+    else if(selectedMapDataType == "Click Rate") {
+        filtered = clicks;
+    }
+    else if(selectedMapDataType == "Reading Duration") {
+        filtered = readTimePerRegion;
+    }
 
-    var z = d3.scaleOrdinal()
-        .range(["#f7f296", "#8d91bb"]);
+    filtered = filtered
+        .filter(function(d){ return d.key == id1 || d.key == id2}).map(function(d) { 
+            var name = metaData.filter(function(md){ return md.CampaignID == d.key})[0]["Name"]
+            return d.values.map(function(d2){
+                return {Campaign: name, value:d2.value, state:convertRegion(d2.key)}  
+            });
+        });
 
-    d3.csv("data.csv", function (d) {
-        var columns = Object.getOwnPropertyNames(d);
-        for (var i = 1, n = columns.length; i < n; ++i) {
-            d[columns[i]] = +d[columns[i]];
-        }
-        return d;
-    }).then(function (data) {
-        var keys = data.columns.slice(1);
-
-        y0.domain(keys);
-        y1.domain(data.map(function (d) { return d.Campaign; })).rangeRound([0, y0.bandwidth()]);
-
-        x.domain([0, d3.max(data, function (d) { return d3.max(keys, function (key) { return d[key]; }); })]).nice();
-
-        g.append("g")
-            .selectAll("g")
-            .data(data)
-            .enter().append("g")
-            .attr("transform", function (d) { return "translate(0," + y1(d.Campaign) + ")"; })
-            .selectAll("rect")
-            .data(function (d) { return keys.map(function (key) { return { key: key, value: d[key], campaign: d.Campaign }; }); })
-            .enter().append("rect")
-            .attr("x", 0)
-            .attr("y", function (d) { return y0(d.key); })
-            .attr("width", function (d) { return width - x(d.value); })
-            .attr("height", y1.bandwidth())
-            .attr("fill", function (d) { return z(d.campaign); })
-            .on("click", function(d){updateMap();});
-
-        g.append("g")
-            .attr("class", "axis")
-            .call(d3.axisLeft(y0));
-
-        var legend = g.append("g")
-            .attr("font-family", "sans-serif")
-            .attr("font-size", 10)
-            .attr("text-anchor", "end")
-            .selectAll("g")
-            .data(data.map(function (d) { return d.Campaign; }))
-            .enter().append("g")
-            .attr("transform", function (d, i) { return "translate(0," + i * 20 + ")"; });
-
-        legend.append("rect")
-            .attr("x", width - 19)
-            .attr("width", 19)
-            .attr("height", 19)
-            .attr("fill", z);
-
-        legend.append("text")
-            .attr("x", width - 24)
-            .attr("y", 12)
-            .attr("dy", "0.32em")
-            .text(function (d) { return d; });
+    filtered.forEach(e => {
+        e.forEach(e2 => {
+            data.push(e2);
+        });
     });
-})("#chart_performance");
 
-function drawMap(selector, data, update) {
-    var svg;
+    var svg = d3.select("#chart_location").select("svg");
 
-    if(update) {
-        svg = d3.select(selector).select("svg");
-    }
-    else {
-        svg = d3.select(selector).append("svg");
-        svg.attr("width", 600);
-        svg.attr("height", 350);
-        svg.attr("viewBox", "0 0 600 350");
-
-        var imagesvg = svg.append("svg"); 
-        imagesvg.attr("viewBox", "0 0 1000 514");
-        imagesvg.attr("width", "100%");
-        imagesvg.attr("preserveAspectRatio", "xMidYMin meet");
-
-        imagesvg.append("image")
-        .attr("preserveAspectRatio", "xMidYMid meet")
-        .attr("xlink:href", "at.svg")
-        .attr("width", 1000).attr("height", 514);
-    }
-    
     var margin = { top: 0, right: 0, bottom: 0, left: 0 },
         width = +svg.attr("width") - margin.left - margin.right,
         height = +svg.attr("height") - margin.top - margin.bottom;
-    
-    var g;
 
-    if(update) {
-        g = svg.select("g").select("g");
-    }
-    else {
-        g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")").append("g");
-    }
+    var g = svg.select("g").select("g");
 
     var keys = ["value"];
-
+    
     var x0 = d3.scaleOrdinal()
         .domain(["V", "LA", "UA", "S", "T", "Vo", "K", "St", "B"])
         .range([525, 465, 360, 270, 130, 10, 370, 450,560]);
@@ -232,26 +288,60 @@ function drawMap(selector, data, update) {
         .transition(500);
 }
 
-function updateMap() {
-    var data = [
-        {Campaign: "Campaign1", value:20, state:"V"},
-        {Campaign: "Campaign2", value:10, state:"V"},
-        {Campaign: "Campaign1", value:40, state:"UA"},
-        {Campaign: "Campaign2", value:10, state:"UA"},
-        {Campaign: "Campaign1", value:30, state:"LA"},
-        {Campaign: "Campaign2", value:40, state:"LA"},
-        {Campaign: "Campaign1", value:30, state:"S"},
-        {Campaign: "Campaign2", value:40, state:"S"},
-        {Campaign: "Campaign1", value:30, state:"T"},
-        {Campaign: "Campaign2", value:40, state:"T"},
-        {Campaign: "Campaign1", value:50, state:"Vo"},
-        {Campaign: "Campaign2", value:40, state:"Vo"},
-        {Campaign: "Campaign1", value:30, state:"K"},
-        {Campaign: "Campaign2", value:80, state:"K"},
-        {Campaign: "Campaign1", value:30, state:"St"},
-        {Campaign: "Campaign2", value:40, state:"St"},
-        {Campaign: "Campaign1", value:30, state:"B"},
-        {Campaign: "Campaign2", value:40, state:"B"},
-    ]
-    drawMap("#chart_location", data, true);
+function drawMap(selector) {
+    var svg = d3.select(selector).append("svg");
+    svg.attr("width", 600);
+    svg.attr("height", 350);
+    svg.attr("viewBox", "0 0 600 350");
+
+    var imagesvg = svg.append("svg"); 
+    imagesvg.attr("viewBox", "0 0 1000 514");
+    imagesvg.attr("width", "100%");
+    imagesvg.attr("preserveAspectRatio", "xMidYMin meet");
+
+    imagesvg.append("image")
+    .attr("preserveAspectRatio", "xMidYMid meet")
+    .attr("xlink:href", "at.svg")
+    .attr("width", 1000).attr("height", 514);
+    
+    var margin = { top: 0, right: 0, bottom: 0, left: 0 },
+        width = +svg.attr("width") - margin.left - margin.right,
+        height = +svg.attr("height") - margin.top - margin.bottom;
+    
+    var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")").append("g");
+}
+
+function convertRegion(region) {
+    switch(region) {
+        case "WIEN":
+            return "V";
+            break; 
+        case "NIEDEROSTERREICH":
+            return "LA";
+            break; 
+        case "OBEROSTERREICH":
+            return "UA";
+            break; 
+        case "SALZBURG":
+            return "S";
+            break; 
+        case "TIROL":
+            return "T";
+            break; 
+        case "VORARLBERG":
+            return "Vo";
+            break; 
+        case "STEIERMARK":
+            return "St";
+            break; 
+        case "KARNTEN":
+            return "K";
+            break; 
+        case "BURGENLAND":
+            return "B";
+            break; 
+        default:
+            return null;
+            break;
+    }
 }

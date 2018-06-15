@@ -6,7 +6,7 @@ var clicks;
 var readTime;
 
 function startup() {
-    d3.csv("data/meta_datav2.CSV", function (d_meta) {
+    d3.csv("data/meta_datav3.CSV", function (d_meta) {
         d_meta["Senddate"] = moment(d_meta["Senddate"], "DD.MM.YYYY HH:mm");
         return d_meta;
     }).then(function (meta_data) {
@@ -15,7 +15,8 @@ function startup() {
         }).then(function (data) {
             var tableData = meta_data.map(function(d){ 
                 var newData = [];
-                newData["Id"] = d["CampaignID"].slice(0,10);
+                newData["Id"] = d["CampaignID"];
+                newData["Name"] = d["Name"];
                 newData["Send date"] = d["Senddate"];
                 return newData;
             })
@@ -23,49 +24,43 @@ function startup() {
             mailData = data;
             metaData = meta_data;
 
-            drawTable("#chart_table", tableData.slice(0,10)); 
-            
             dataPerCamapign = d3.nest()
                 .key(function(d) { return d.SendId; })
                 .entries(data);
 
             openings = d3.nest()
-                .key(function(d) { return { sendId: d.SendId, region: d.Region }; })
+                .key(function(d) { return  d.SendId; })
+                .key(function(d) { return d.Region.toUpperCase(); })
                 .rollup(function(v) { return v.length; })
-                .entries(data.filter(function(d){ d.type == "opening"}));
+                .entries(data.filter(function(d){ return d.Event == "opening"}));
 
             clicks = d3.nest()
-                .key(function(d) { return { sendId: d.SendId, region: d.Region }; })
+                .key(function(d) { return  d.SendId; })
+                .key(function(d) { return d.Region.toUpperCase(); })
                 .rollup(function(v) { return v.length; })
-                .entries(data.filter(function(d){ d.type == "clicks"}));
+                .entries(data.filter(function(d){ return d.Event == "click"}));
 
             readTime = d3.nest()
-                .key(function(d) { return { sendId: d.SendId, region: d.Region }; })
-                .rollup(function(v) { return d3.mean(selectedData, function(d) { return +d.ReadTime}); })
-                .entries(data.filter(function(d){ d.type == "opening" && d.ReadTime != "NULL"}));
+                .key(function(d) { return  d.SendId; })
+                .rollup(function(v) { return d3.mean(v, function(d) { return +d.ReadTime}); })
+                .entries(data.filter(function(d){ return d.Event == "opening" && d.ReadTime != "NULL"}));
 
-            drawMap("#chart_location", meta_data[0].Id, meta_data[1].Id, "OpenRate", false); 
+            readTimePerRegion = d3.nest()
+                .key(function(d) { return  d.SendId; })
+                .key(function(d) { return d.Region.toUpperCase(); })
+                .rollup(function(v) { return d3.mean(v, function(d) { return +d.ReadTime}); })
+                .entries(data.filter(function(d){ return d.Event == "opening" && d.ReadTime != "NULL"}));
 
-            var data = [
-                {Campaign: "Campaign1", value:10, state:"V"},
-                {Campaign: "Campaign2", value:20, state:"V"},
-                {Campaign: "Campaign1", value:20, state:"UA"},
-                {Campaign: "Campaign2", value:10, state:"UA"},
-                {Campaign: "Campaign1", value:30, state:"LA"},
-                {Campaign: "Campaign2", value:20, state:"LA"},
-                {Campaign: "Campaign1", value:30, state:"S"},
-                {Campaign: "Campaign2", value:20, state:"S"},
-                {Campaign: "Campaign1", value:30, state:"T"},
-                {Campaign: "Campaign2", value:20, state:"T"},
-                {Campaign: "Campaign1", value:50, state:"Vo"},
-                {Campaign: "Campaign2", value:20, state:"Vo"},
-                {Campaign: "Campaign1", value:30, state:"K"},
-                {Campaign: "Campaign2", value:20, state:"K"},
-                {Campaign: "Campaign1", value:30, state:"St"},
-                {Campaign: "Campaign2", value:20, state:"St"},
-                {Campaign: "Campaign1", value:30, state:"B"},
-                {Campaign: "Campaign2", value:20, state:"B"},
-            ]
+            drawTable("#chart_table", tableData.slice(0, 10)); 
+            drawBars();
+            drawMap("#chart_location"); 
+
+            selectedCampaigns.push(tableData[0]["Id"]);
+            selectedCampaigns.push(tableData[1]["Id"]);
+
+            updateTable("#chart_table");
+            updateBars();
+            addMapData("#chart_location");
         });
     });
 }
