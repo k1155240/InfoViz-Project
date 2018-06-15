@@ -1,17 +1,16 @@
-function drawTable(selector, data, update) {
-    var table = d3.select(selector).append('table').attr();
-    var thead = table.append('thead');
-    var	tbody = table.append('tbody');
+function drawTable(selector, data) {
+    var table = d3.select(selector).append('table');
 
+    var columns = ["Id", "Send date", "Color"];
     // append the header row
-    thead.append('tr')
+    table.append('tr')
         .selectAll('th')
-        .data(["Id", "Send time", "Color"]).enter()
+        .data(columns).enter()
         .append('th')
         .text(function (column) { return column; });
 
     // create a row for each object in the data
-    var rows = tbody.selectAll('tr')
+    var rows = table.selectAll('tr')
         .data(data)
         .enter()
         .append('tr');
@@ -19,13 +18,11 @@ function drawTable(selector, data, update) {
     // create a cell in each row for each column
     var cells = rows.selectAll('td')
         .data(function (row) {
-        return columns.map(function (column) {
-            return {column: column, value: row[column]};
-        });
+            return [row["Id"], row["Send date"].format("YYYY-mm-DD hh:mm")]
         })
         .enter()
         .append('td')
-        .text(function (d) { return d.value; });
+        .text(function (d) { return d; });
 }
 
 (function (selector) {
