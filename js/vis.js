@@ -1,17 +1,23 @@
 var selectedCampaigns = [];
 var selectedMapDataType = "Open Rate";
 
-function updateTable(selector) {
-    var color = d3.scaleOrdinal()
-        .range(["#f7f296", "#8d91bb"]);
+function selectedColor(id) {
+    if(selectedCampaigns[0] == id)
+        return "#f7f296";
+    else if(selectedCampaigns[1] == id)
+        return "#8d91bb";
+    else 
+        return "";
+}
 
+function updateTable(selector) {
     d3.select(selector)
         .select('table')
         .selectAll('tr.data')
         .transition()
         .style("background-color", function(d, i) { 
             var id = d3.select(this).attr("data-id");
-            return id !== null && selectedCampaigns.includes(id) ? color(id) : "" ;});
+            return id !== null && selectedColor(id);});
 }
 
 function selectCampaign(d, selector) {
@@ -58,60 +64,7 @@ function drawTable(selector, data) {
         .text(function (d) { return d; });
 }
 
-(function (selector) {
-    var svg = d3.select(selector).append("svg");
-    svg.attr("width", 450);
-    svg.attr("height", 200);
-    svg = svg.append("g").attr("transform", "translate(" + 5 + "," + 5 + ")");
 
-    var data = [
-        {Campaign: "Campaign1", senddate:new Date('2018-06-05T03:24:00')},
-        {Campaign: "Campaign2", senddate:new Date('2018-06-05T03:26:00')},
-        {Campaign: "Campaign3", senddate:new Date('2018-06-06T03:27:00')},
-        {Campaign: "Campaign4", senddate:new Date('2018-06-06T03:28:00')},
-        {Campaign: "Campaign5", senddate:new Date('2018-06-06T03:29:00')},
-        {Campaign: "Campaign6", senddate:new Date('2018-06-07T03:24:00')},
-        {Campaign: "Campaign7", senddate:new Date('2018-06-08T03:24:00')},
-        {Campaign: "Campaign8", senddate:new Date('2018-06-08T03:24:00')},
-        {Campaign: "Campaign9", senddate:new Date('2018-06-08T03:24:00')},
-        {Campaign: "Campaign10", senddate:new Date('2018-06-09T03:24:00')},
-        {Campaign: "Campaign11", senddate:new Date('2018-06-09T03:24:00')}
-    ]
-
-    var width = 440;
-    var x = d3.scaleBand()
-        .rangeRound([0, 200])
-        .paddingInner(0.1)
-        .domain(data.map(function(d){return d.senddate.setHours(0,0,0,0) }));
-
-    var x1 = d3.scaleBand()
-        .padding(0.05)
-        .domain(data.map(function (d) { return d.Campaign; })).rangeRound([0, x.bandwidth()]);
-    
-    svg.append("g").append("rect")
-        .attr("x", 0)
-        .attr("y", 0)
-        .attr("width", width)
-        .attr("height", 100)
-        .style("stroke", "black")
-        .style("stroke-width", 1)
-        .style("fill", "none");
-           
-    svg.append("g")
-        .selectAll("g")
-        .data(data)
-        .enter().append("g")
-        .attr("transform", function (d) { return "translate(" + x(d.senddate.setHours(0,0,0,0)) + ",0)"; })
-        .selectAll("rect")
-        .data(function (d) { return [d] })
-        .enter().append("rect")
-        .attr("x",10)
-        .attr("y", 0)
-        .attr("width", 10)
-        .attr("height", 100)
-        .attr("fill", "black");
-
-})("#chart_timeline");
 
 function updateBars() {
     var id1 = selectedCampaigns[0];
@@ -120,7 +73,7 @@ function updateBars() {
     var data = metaData.filter(function(md){ return md.CampaignID == id1 || md.CampaignID == id2})
         .map(function(m) { 
             return {
-                Id: m["Name"],
+                Id: m["CampaignID"],
                 Campaign: m["Name"],
                 "Open Rate": openings
                     .filter(function(d){ return d.key == m.CampaignID}).map(function(d) { 
@@ -152,8 +105,6 @@ function updateBars() {
         .padding(0.05);
     var x = d3.scaleLinear()
         .rangeRound([barwidth, 0]);
-    var z = d3.scaleOrdinal()
-        .range(["#f7f296", "#8d91bb"]);
 
     var keys = ["Open Rate", "Click Rate", "Reading Duration"];
 
@@ -187,14 +138,14 @@ function updateBars() {
 
     g.select("g.data")
     .selectAll("g")
-    .selectAll("rect").data(function (d) { return keys.map(function (key) { return { key: key, value: d[key], campaign: d.Campaign }; }); }).transition()
+    .selectAll("rect").data(function (d) { return keys.map(function (key) { return { key: key, value: d[key], Id: d.Id, campaign: d.Campaign }; }); }).transition()
         .duration(500)
         .attr("x", 0)
         .attr("y", function (d) { return y0(d.key); })
         .attr("width", function (d) { 
             return barwidth - x(d.value); })
         .attr("height", y1.bandwidth())
-        .attr("fill", function (d) { return z(d.campaign); })
+        .attr("fill", function (d) { return selectedColor(d.Id); })
 
     g.select("g.axis")
         .call(d3.axisLeft(y0))
@@ -206,9 +157,16 @@ function updateBars() {
         .attr("font-size", 10)
         .attr("text-anchor", "end")
         .selectAll("g")
-        .data(data.map(function (d) { return d.Campaign; }));
+        .data({});
 
     legend.exit().remove();
+
+    var legend = g.select("g.legend")
+        .attr("font-family", "sans-serif")
+        .attr("font-size", 10)
+        .attr("text-anchor", "end")
+        .selectAll("g")
+        .data(data.map(function (d) { return d; }));
     var gLegend = legend.enter().append("g")
         .attr("transform", function (d, i) { return "translate(0," + i * 20 + ")"; });
 
@@ -216,13 +174,13 @@ function updateBars() {
         .attr("x", width - 19)
         .attr("width", 19)
         .attr("height", 19)
-        .attr("fill", z);
+        .attr("fill", function (d) { return selectedColor(d.Id); });
 
     gLegend.append("text")
         .attr("x", width - 24)
         .attr("y", 12)
         .attr("dy", "0.32em")
-        .text(function (d) { return d; });
+        .text(function (d) { return d.Campaign; });
 }
 
 function drawBars() {
@@ -239,169 +197,5 @@ function drawBars() {
     g.append("g").attr("class", "legend");
 };
 
-function addMapData() {
-    var data = [];
-    var filtered;
 
-    var id1 = selectedCampaigns[0];
-    var id2 = selectedCampaigns[1];
 
-    if(selectedMapDataType == "Open Rate") {
-        filtered = openings;
-    }
-    else if(selectedMapDataType == "Click Rate") {
-        filtered = clicks;
-    }
-    else if(selectedMapDataType == "Reading Duration") {
-        filtered = readTimePerRegion;
-    }
-
-    filtered = filtered
-        .filter(function(d){ return d.key == id1 || d.key == id2}).map(function(d) { 
-            var name = metaData.filter(function(md){ return md.CampaignID == d.key})[0]["Name"]
-            return d.values.map(function(d2){
-                return {Campaign: name, value:d2.value, state:convertRegion(d2.key)}  
-            })
-            .filter(function(a) {return a.state !== null})
-            .sort(function(a, b) {
-                if (a.state < b.state) {
-                  return -1;
-                }
-                if (a.state > b.state) {
-                  return 1;
-                }
-              
-                // names must be equal
-                return 0;
-              });
-        });
-
-    filtered.forEach(e => {
-        e.forEach(e2 => {
-            data.push(e2);
-        });
-    });
-
-    var svg = d3.select("#chart_location").select("svg");
-
-    var margin = { top: 0, right: 0, bottom: 0, left: 0 },
-        width = +svg.attr("width") - margin.left - margin.right,
-        height = +svg.attr("height") - margin.top - margin.bottom;
-
-    var g = svg.select("g");
-
-    var keys = ["value"];
-    
-    var x0 = d3.scaleOrdinal()
-        .domain(["V", "LA", "UA", "S", "T", "Vo", "K", "St", "B"])
-        .range([525, 465, 360, 270, 130, 10, 370, 450,560]);
-
-    var x = d3.scaleBand()
-        .padding(0.1)
-        .domain(data.map(function (d) { return d.Campaign; }))
-        .rangeRound([0, width/20]);
-    
-    var y0 = d3.scaleOrdinal()
-        .domain(["V", "LA", "UA", "S", "T", "Vo", "K", "St", "B"])
-        .range([25, 20, 15, 75, 140, 120, 210, 160, 70]);
-
-    var y = d3.scaleLinear()
-        .rangeRound([height/5, 0])
-        .domain([0, d3.max(data, function (d) { return d3.max(keys, function (key) { return d[key]; }); })])
-        .nice();
-    var z = d3.scaleOrdinal()
-        .range(["#f7f296", "#8d91bb"]);
-
-    var gdata = g.select("g.data")
-        .selectAll("g")
-        .data(data);
-
-    gdata.exit().remove();
-    gdata.enter().append("g")
-        .attr("transform", function (d) { return "translate(" + x(d.Campaign) + ",0)"; })
-    gdata.transition()
-        .attr("transform", function (d) { return "translate(" + x(d.Campaign) + ",0)"; })
-    
-    var rectData = g.select("g.data")
-        .selectAll("g")
-        .selectAll("rect")
-        .data(function (d) { 
-            return keys.map(function (key) { return { key: key, value: d[key], campaign: d.Campaign, state: d.state }; }); })
-    
-    rectData.exit().remove();
-    rectData.enter().append("rect")
-        .attr("x", function(d) { return x0(d.state); })
-        .attr("y", function (d) { return y0(d.state) + height/5; })
-        .attr("width", x.bandwidth())
-        .attr("height", function (d) { return 0; });
-
-    g.select("g.data")
-        .selectAll("g")
-        .selectAll("rect")
-        .data(function (d) { return keys.map(function (key) { return { key: key, value: d[key], campaign: d.Campaign, state: d.state }; }); })
-        .transition()
-        .duration(500)
-        .attr("x", function(d) { return x0(d.state); })
-        .attr("y", function (d) { return y0(d.state) + y(d.value); })
-        .attr("width", x.bandwidth())
-        .attr("height", function (d) { return height/5 - y(d.value); })
-        .attr("fill", function (d) { return z(d.campaign); });
-}
-
-function drawMap(selector) {
-    var svg = d3.select(selector).append("svg");
-    svg.attr("width", 600);
-    svg.attr("height", 350);
-    svg.attr("viewBox", "0 0 600 350");
-
-    var imagesvg = svg.append("svg"); 
-    imagesvg.attr("viewBox", "0 0 1000 514");
-    imagesvg.attr("width", "100%");
-    imagesvg.attr("preserveAspectRatio", "xMidYMin meet");
-
-    imagesvg.append("image")
-    .attr("preserveAspectRatio", "xMidYMid meet")
-    .attr("xlink:href", "at.svg")
-    .attr("width", 1000).attr("height", 514);
-    
-    var margin = { top: 0, right: 0, bottom: 0, left: 0 },
-        width = +svg.attr("width") - margin.left - margin.right,
-        height = +svg.attr("height") - margin.top - margin.bottom;
-    
-    var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")").append("g").attr("class", "data");;
-}
-
-function convertRegion(region) {
-    switch(region) {
-        case "WIEN":
-            return "V";
-            break; 
-        case "NIEDEROSTERREICH":
-            return "LA";
-            break; 
-        case "OBEROSTERREICH":
-            return "UA";
-            break; 
-        case "SALZBURG":
-            return "S";
-            break; 
-        case "TIROL":
-            return "T";
-            break; 
-        case "VORARLBERG":
-            return "Vo";
-            break; 
-        case "STEIERMARK":
-            return "St";
-            break; 
-        case "KARNTEN":
-            return "K";
-            break; 
-        case "BURGENLAND":
-            return "B";
-            break; 
-        default:
-            return null;
-            break;
-    }
-}

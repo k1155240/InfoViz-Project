@@ -61,6 +61,7 @@ function startup() {
             updateTable("#chart_table");
             updateBars();
             addMapData("#chart_location");
+            drawScatterPlot();
         });
     });
 }
