@@ -42,6 +42,7 @@
 
  .campaigncontainer table {
      color: black;
+     border-collapse:collapse;
  }
 
 .campaigncontainer th {

@@ -6,11 +6,11 @@ var clicks;
 var readTime;
 
 function startup() {
-    d3.csv("data/meta_datav3.CSV", function (d_meta) {
+    d3.csv("data/meta_datav4.CSV", function (d_meta) {
         d_meta["Senddate"] = moment(d_meta["Senddate"], "DD.MM.YYYY HH:mm");
         return d_meta;
     }).then(function (meta_data) {
-        d3.csv("data/data_v4.CSV", function (data) {
+        d3.csv("data/data_v5.CSV", function (data) {
             return data;
         }).then(function (data) {
             var tableData = meta_data.map(function(d){ 

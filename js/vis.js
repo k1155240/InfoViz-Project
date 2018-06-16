@@ -51,7 +51,7 @@ function drawTable(selector, data) {
     // create a cell in each row for each column
     var cells = rows.selectAll('td')
         .data(function (row) {
-            return [row["Name"], row["Send date"].format("YYYY-mm-DD hh:mm")]
+            return [row["Name"], row["Send date"].format("YYYY-MM-DD hh:mm")]
         })
         .enter()
         .append('td')
@@ -120,14 +120,15 @@ function updateBars() {
     var data = metaData.filter(function(md){ return md.CampaignID == id1 || md.CampaignID == id2})
         .map(function(m) { 
             return {
+                Id: m["Name"],
                 Campaign: m["Name"],
                 "Open Rate": openings
                     .filter(function(d){ return d.key == m.CampaignID}).map(function(d) { 
-                        return d3.sum(d.values, function(d2){ return d2.value; })
+                        return d3.sum(d.values, function(d2){ return d2.value; })/m["Mails"] * 100
                     })[0],
                 "Click Rate": clicks
                     .filter(function(d){ return d.key == m.CampaignID}).map(function(d) { 
-                        return d3.sum(d.values, function(d2){ return d2.value; })
+                        return d3.sum(d.values, function(d2){ return d2.value; })/m["Mails"] * 100
                     })[0],
                 "Reading Duration": readTime
                     .filter(function(d){ return d.key == m.CampaignID}).map(function(d) { 
@@ -142,13 +143,15 @@ function updateBars() {
         height = +svg.attr("height") - margin.top - margin.bottom,
         g = svg.select("g");
 
+
+    var barwidth = width - 65;
     var y0 = d3.scaleBand()
         .rangeRound([0, height])
         .paddingInner(0.1);
     var y1 = d3.scaleBand()
         .padding(0.05);
     var x = d3.scaleLinear()
-        .rangeRound([width, 0]);
+        .rangeRound([barwidth, 0]);
     var z = d3.scaleOrdinal()
         .range(["#f7f296", "#8d91bb"]);
 
@@ -159,42 +162,63 @@ function updateBars() {
 
     x.domain([0, d3.max(data, function (d) { return d3.max(keys, function (key) { return d[key]; }); })]).nice();
 
-    g.selectAll("g").remove();
-    g.append("g")
+    var gdata = g.select("g.data")
         .selectAll("g")
-        .data(data)
-        .enter().append("g")
-        .attr("transform", function (d) { return "translate(0," + y1(d.Campaign) + ")"; })
+        .data(data);
+
+    gdata.exit().remove();
+    gdata.enter().append("g")
+        .attr("transform", function (d) { return "translate(0," + y1(d.Campaign) + ")"; });
+    gdata.transition()
+        .attr("transform", function (d) { return "translate(0," + y1(d.Campaign) + ")"; });
+    
+    var rectData = g.select("g.data")
+        .selectAll("g")
         .selectAll("rect")
         .data(function (d) { return keys.map(function (key) { return { key: key, value: d[key], campaign: d.Campaign }; }); })
-        .enter().append("rect")
+    
+    rectData.exit().remove();
+    rectData.enter().append("rect")
         .attr("x", 0)
         .attr("y", function (d) { return y0(d.key); })
-        .attr("width", function (d) { return width - x(d.value); })
+        .attr("width", function (d) { return 0; })
+        .attr("height", y1.bandwidth())
+        .on("click", function(d){ selectedMapDataType = d.key; updateBars(); addMapData();});
+
+    g.select("g.data")
+    .selectAll("g")
+    .selectAll("rect").data(function (d) { return keys.map(function (key) { return { key: key, value: d[key], campaign: d.Campaign }; }); }).transition()
+        .duration(500)
+        .attr("x", 0)
+        .attr("y", function (d) { return y0(d.key); })
+        .attr("width", function (d) { 
+            return barwidth - x(d.value); })
         .attr("height", y1.bandwidth())
         .attr("fill", function (d) { return z(d.campaign); })
-        .on("click", function(d){ selectedMapDataType = d.key; addMapData();});
 
-    g.append("g")
-        .attr("class", "axis")
-        .call(d3.axisLeft(y0));
+    g.select("g.axis")
+        .call(d3.axisLeft(y0))
+        .selectAll("text")
+        .attr("text-decoration", function(d, i) { return d == selectedMapDataType  ? "underline" : "none";});
 
-    var legend = g.append("g")
+    var legend = g.select("g.legend")
         .attr("font-family", "sans-serif")
         .attr("font-size", 10)
         .attr("text-anchor", "end")
         .selectAll("g")
-        .data(data.map(function (d) { return d.Campaign; }))
-        .enter().append("g")
+        .data(data.map(function (d) { return d.Campaign; }));
+
+    legend.exit().remove();
+    var gLegend = legend.enter().append("g")
         .attr("transform", function (d, i) { return "translate(0," + i * 20 + ")"; });
 
-    legend.append("rect")
+    gLegend.append("rect")
         .attr("x", width - 19)
         .attr("width", 19)
         .attr("height", 19)
         .attr("fill", z);
 
-    legend.append("text")
+    gLegend.append("text")
         .attr("x", width - 24)
         .attr("y", 12)
         .attr("dy", "0.32em")
@@ -209,6 +233,10 @@ function drawBars() {
         width = +svg.attr("width") - margin.left - margin.right,
         height = +svg.attr("height") - margin.top - margin.bottom,
         g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    g.append("g").attr("class", "data");
+    g.append("g").attr("class", "axis");
+    g.append("g").attr("class", "legend");
 };
 
 function addMapData() {
@@ -233,7 +261,19 @@ function addMapData() {
             var name = metaData.filter(function(md){ return md.CampaignID == d.key})[0]["Name"]
             return d.values.map(function(d2){
                 return {Campaign: name, value:d2.value, state:convertRegion(d2.key)}  
-            });
+            })
+            .filter(function(a) {return a.state !== null})
+            .sort(function(a, b) {
+                if (a.state < b.state) {
+                  return -1;
+                }
+                if (a.state > b.state) {
+                  return 1;
+                }
+              
+                // names must be equal
+                return 0;
+              });
         });
 
     filtered.forEach(e => {
@@ -248,7 +288,7 @@ function addMapData() {
         width = +svg.attr("width") - margin.left - margin.right,
         height = +svg.attr("height") - margin.top - margin.bottom;
 
-    var g = svg.select("g").select("g");
+    var g = svg.select("g");
 
     var keys = ["value"];
     
@@ -272,20 +312,40 @@ function addMapData() {
     var z = d3.scaleOrdinal()
         .range(["#f7f296", "#8d91bb"]);
 
-    g.selectAll("g").remove();
-    g.selectAll("g")
-        .data(data)
-        .enter().append("g")
+    var gdata = g.select("g.data")
+        .selectAll("g")
+        .data(data);
+
+    gdata.exit().remove();
+    gdata.enter().append("g")
         .attr("transform", function (d) { return "translate(" + x(d.Campaign) + ",0)"; })
+    gdata.transition()
+        .attr("transform", function (d) { return "translate(" + x(d.Campaign) + ",0)"; })
+    
+    var rectData = g.select("g.data")
+        .selectAll("g")
+        .selectAll("rect")
+        .data(function (d) { 
+            return keys.map(function (key) { return { key: key, value: d[key], campaign: d.Campaign, state: d.state }; }); })
+    
+    rectData.exit().remove();
+    rectData.enter().append("rect")
+        .attr("x", function(d) { return x0(d.state); })
+        .attr("y", function (d) { return y0(d.state) + height/5; })
+        .attr("width", x.bandwidth())
+        .attr("height", function (d) { return 0; });
+
+    g.select("g.data")
+        .selectAll("g")
         .selectAll("rect")
         .data(function (d) { return keys.map(function (key) { return { key: key, value: d[key], campaign: d.Campaign, state: d.state }; }); })
-        .enter().append("rect")
+        .transition()
+        .duration(500)
         .attr("x", function(d) { return x0(d.state); })
         .attr("y", function (d) { return y0(d.state) + y(d.value); })
         .attr("width", x.bandwidth())
         .attr("height", function (d) { return height/5 - y(d.value); })
-        .attr("fill", function (d) { return z(d.campaign); })
-        .transition(500);
+        .attr("fill", function (d) { return z(d.campaign); });
 }
 
 function drawMap(selector) {
@@ -308,7 +368,7 @@ function drawMap(selector) {
         width = +svg.attr("width") - margin.left - margin.right,
         height = +svg.attr("height") - margin.top - margin.bottom;
     
-    var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")").append("g");
+    var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")").append("g").attr("class", "data");;
 }
 
 function convertRegion(region) {
