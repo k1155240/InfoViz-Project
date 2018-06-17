@@ -31,7 +31,7 @@
     color: #808080;
 }
 
-.axis .domain {
+#chart_performance .axis .domain {
     display: none;
  }
 
@@ -59,4 +59,25 @@
 
 .big {
     width: 600px
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+
+.dot {
+  stroke: #000;
+}
+
+.tooltip {
+  position: absolute;
+  width: auto;
+  height: auto;
+  pointer-events: none;
+  background-color: white;
+  border: #000 1px solid;
 }
