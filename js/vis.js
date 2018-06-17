@@ -31,6 +31,7 @@ function selectCampaign(d, selector) {
     updateTable(selector);
     addMapData();
     updateBars();
+    updateScatterPlot();
 }
 
 function drawTable(selector, data) {
@@ -126,7 +127,7 @@ function updateBars() {
     var rectData = g.select("g.data")
         .selectAll("g")
         .selectAll("rect")
-        .data(function (d) { return keys.map(function (key) { return { key: key, value: d[key], campaign: d.Campaign }; }); })
+        .data(function (d) { return keys.map(function (key) { return { key: key, value: d[key], Id: d.Id, campaign: d.Campaign }; }); })
     
     rectData.exit().remove();
     rectData.enter().append("rect")
@@ -134,13 +135,13 @@ function updateBars() {
         .attr("y", function (d) { return y0(d.key); })
         .attr("width", function (d) { return 0; })
         .attr("height", y1.bandwidth())
-        .on("click", function(d){ selectedMapDataType = d.key; updateBars(); addMapData();});
-
-    g.select("g.data")
-    .selectAll("g")
-    .selectAll("rect").data(function (d) { return keys.map(function (key) { return { key: key, value: d[key], Id: d.Id, campaign: d.Campaign }; }); }).transition()
-        .duration(500)
-        .attr("x", 0)
+        .attr("fill", function (d) { return selectedColor(d.Id); })
+        .on("click", function(d){ selectedMapDataType = d.key; updateBars(); addMapData();})
+        .transition()
+        .attr("width", function (d) { 
+            return barwidth - x(d.value); })
+            
+    rectData.transition()
         .attr("y", function (d) { return y0(d.key); })
         .attr("width", function (d) { 
             return barwidth - x(d.value); })
@@ -151,36 +152,6 @@ function updateBars() {
         .call(d3.axisLeft(y0))
         .selectAll("text")
         .attr("text-decoration", function(d, i) { return d == selectedMapDataType  ? "underline" : "none";});
-
-    var legend = g.select("g.legend")
-        .attr("font-family", "sans-serif")
-        .attr("font-size", 10)
-        .attr("text-anchor", "end")
-        .selectAll("g")
-        .data({});
-
-    legend.exit().remove();
-
-    var legend = g.select("g.legend")
-        .attr("font-family", "sans-serif")
-        .attr("font-size", 10)
-        .attr("text-anchor", "end")
-        .selectAll("g")
-        .data(data.map(function (d) { return d; }));
-    var gLegend = legend.enter().append("g")
-        .attr("transform", function (d, i) { return "translate(0," + i * 20 + ")"; });
-
-    gLegend.append("rect")
-        .attr("x", width - 19)
-        .attr("width", 19)
-        .attr("height", 19)
-        .attr("fill", function (d) { return selectedColor(d.Id); });
-
-    gLegend.append("text")
-        .attr("x", width - 24)
-        .attr("y", 12)
-        .attr("dy", "0.32em")
-        .text(function (d) { return d.Campaign; });
 }
 
 function drawBars() {

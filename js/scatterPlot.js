@@ -20,8 +20,6 @@ function drawScatterPlot() {
     var y = function(d) { return d["Click Rate"];},
         yScale = d3.scaleLinear().range([height, 0]).domain([0, d3.max(data, y)+1]);
 
-    var color = d3.scaleOrdinal(d3.schemeCategory10);
-
     svg.append("g")
         .attr("class", "x axis")
         .attr("transform", "translate(0," + height + ")")
@@ -50,18 +48,39 @@ function drawScatterPlot() {
         .style("text-anchor", "end")
         .text("Click Rate (%)");
 
+    updateScatterPlot();
+}
+
+function updateScatterPlot() {
+    var data = metaData.map(function(d) {
+        return {Id: d["CampaignID"], Name: d["Name"], "Open Rate": d["Openings"]/d["Mails"] * 100, "Click Rate": d["Clicks"]/d["Mails"] * 100}
+    });
+
+    var margin = {top: 20, right: 20, bottom: 40, left: 50},
+        width = 400 - margin.left - margin.right,
+        height = 200 - margin.top - margin.bottom;
+
+    var svg = d3.select("#chart_timeline")
+        .select("svg").select("g");
+
+    var x = function(d) { return d["Open Rate"];},
+        xScale = d3.scaleLinear().range([0, width]).domain([0, d3.max(data, x)+10]);
+    var y = function(d) { return d["Click Rate"];},
+        yScale = d3.scaleLinear().range([height, 0]).domain([0, d3.max(data, y)+1]);
+    var color = d3.scaleOrdinal(d3.schemeCategory10);
+
+    var plot = svg.selectAll(".dot")
+        .data(data);
     var tooltip = d3.select("#chart_timeline").append("div")
         .attr("class", "tooltip")
         .style("opacity", 0);
 
-    svg.selectAll(".dot")
-        .data(data)
-        .enter().append("circle")
+    plot.enter().append("circle")
         .attr("class", "dot")
-        .attr("r", 3.5)
+        .attr("r",  0.1)
         .attr("cx", function(d) { return xScale(x(d)); })
         .attr("cy", function(d) { return yScale(y(d)); })
-        .style("fill", function(d) { return color(d.Name);}) 
+        .style("fill", function(d) { var col = selectedColor(d.Id); var stdCol = color(d.Name); return col === "" ? stdCol : col;}) 
         .on("mouseover", function(d) {
             tooltip.transition()
                 .duration(200)
@@ -75,5 +94,12 @@ function drawScatterPlot() {
             tooltip.transition()
                 .duration(500)
                 .style("opacity", 0);
-        });
+        })
+        .transition()
+        .attr("r",  function(d) { return selectedCampaigns.includes(d["Id"]) ? 7 : 3.5})
+        .style("fill", function(d) { var col = selectedColor(d.Id); var stdCol = color(d.Name); return col === "" ? stdCol : col;}) 
+    
+    plot.transition()
+        .attr("r",  function(d) { return selectedCampaigns.includes(d["Id"]) ? 7 : 3.5})
+        .style("fill", function(d) { var col = selectedColor(d.Id); var stdCol = color(d.Name); return col === "" ? stdCol : col;}) 
 }

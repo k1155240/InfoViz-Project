@@ -90,13 +90,16 @@ function addMapData() {
         .attr("x", function(d) { return x0(d.state); })
         .attr("y", function (d) { return y0(d.state) + height/5; })
         .attr("width", x.bandwidth())
-        .attr("height", function (d) { return 0; });
-
-    g.select("g.data")
-        .selectAll("g")
-        .selectAll("rect")
-        .data(function (d) { return keys.map(function (key) { return { key: key, value: d[key], Id:d.Id, campaign: d.Campaign, state: d.state }; }); })
+        .attr("height", function (d) { return 0; })
+        .attr("fill", function (d) {  return selectedColor(d.Id); })
         .transition()
+        .attr("x", function(d) { return x0(d.state); })
+        .attr("y", function (d) { return y0(d.state) + y(d.value); })
+        .attr("width", x.bandwidth())
+        .attr("height", function (d) { return height/5 - y(d.value); })
+        .attr("fill", function (d) {  return selectedColor(d.Id); });
+
+    rectData.transition()
         .duration(500)
         .attr("x", function(d) { return x0(d.state); })
         .attr("y", function (d) { return y0(d.state) + y(d.value); })
