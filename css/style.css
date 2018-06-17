@@ -49,6 +49,10 @@
      border-collapse:collapse;
  }
 
+ .campaigncontainer table tr.data {
+    cursor: pointer;
+}
+
 .campaigncontainer th {
     padding-bottom: 15px;
     font-family: Verdana, Geneva, Tahoma, sans-serif;

@@ -152,6 +152,7 @@ function updateBars() {
         .attr("width", function (d) { return 0; })
         .attr("height", y1.bandwidth())
         .attr("fill", function (d) { return selectedColor(d.Id); })
+        .style("cursor", "pointer")
         .on("click", function(d){ selectedMapDataType = d.key; updateBars(); addMapData();})
         .on("mouseover", function(d) {
             tooltip.transition()

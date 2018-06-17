@@ -206,10 +206,10 @@ function toolTipTextMap(d, data) {
     }
 
     if(selectedMapDataType == "Open Rate" || selectedMapDataType == "Click Rate")
-        text += "<br/>("+ (d.value/campaign.Mails * 100).toPrecision(2) + "% of all)";
+        text += "<br/>("+ (d.value/campaign.Mails * 100).toPrecision(2) + "% of total)";
 
     if(selectedMapDataType == "Reading Duration") {
-        text += d["campaign"] + "<br/> " + selectedMapDataType + ": " + d.value + "s";
+        text += "<br/> " + selectedMapDataType + ": " + d.value.toPrecision(2) + "s";
     }
 
     return text;
