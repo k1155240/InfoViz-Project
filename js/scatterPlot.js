@@ -5,7 +5,7 @@ function drawScatterPlot() {
 
     var margin = {top: 20, right: 20, bottom: 40, left: 50},
         width = 400 - margin.left - margin.right,
-        height = 200 - margin.top - margin.bottom;
+        height = 230 - margin.top - margin.bottom;
 
     var svg = d3.select("#chart_timeline")
         .append("svg")
@@ -58,7 +58,7 @@ function updateScatterPlot() {
 
     var margin = {top: 20, right: 20, bottom: 40, left: 50},
         width = 400 - margin.left - margin.right,
-        height = 200 - margin.top - margin.bottom;
+        height = 230 - margin.top - margin.bottom;
 
     var svg = d3.select("#chart_timeline")
         .select("svg").select("g");
@@ -71,9 +71,7 @@ function updateScatterPlot() {
 
     var plot = svg.selectAll(".dot")
         .data(data);
-    var tooltip = d3.select("#chart_timeline").append("div")
-        .attr("class", "tooltip")
-        .style("opacity", 0);
+    var tooltip = d3.select("body").select("div.tooltip");
 
     plot.enter().append("circle")
         .attr("class", "dot")

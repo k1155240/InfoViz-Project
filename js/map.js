@@ -64,11 +64,23 @@ function addMapData() {
         .domain(["V", "LA", "UA", "S", "T", "Vo", "K", "St", "B"])
         .range([25, 20, 15, 75, 140, 120, 210, 160, 70]);
 
+    var mapType = d3.select('input[name="mapType"]:checked').node().value;
     var y = d3.scaleLinear()
         .rangeRound([height/5, 0])
         .domain([0, d3.max(data, function (d) { return d3.max(keys, function (key) { return d[key]; }); })])
         .nice();
 
+    var getY = function(state) {
+        if(mapType == "all")
+            return y;
+        else {
+            return d3.scaleLinear()
+            .rangeRound([height/5, 0])
+            .domain([0, d3.max(data.filter(function(d) {return d.state == state;}), function (d) { return d3.max(keys, function (key) { return d[key]; }); })])
+            .nice();
+        }
+    }
+    
     var gdata = g.select("g.data")
         .selectAll("g")
         .data(data);
@@ -85,6 +97,8 @@ function addMapData() {
         .data(function (d) { 
             return keys.map(function (key) { return { key: key, value: d[key], Id:d.Id, campaign: d.Campaign, state: d.state }; }); })
     
+    var tooltip = d3.select("body").select("div.tooltip");
+
     rectData.exit().remove();
     rectData.enter().append("rect")
         .attr("x", function(d) { return x0(d.state); })
@@ -92,24 +106,37 @@ function addMapData() {
         .attr("width", x.bandwidth())
         .attr("height", function (d) { return 0; })
         .attr("fill", function (d) {  return selectedColor(d.Id); })
+        .on("mouseover", function(d) {
+            tooltip.transition()
+                .duration(200)
+                .style("opacity", 1);
+            tooltip.html(toolTipTextMap(d, data))
+                .style("left", (d3.event.pageX + 10) + "px")
+                .style("top", (d3.event.pageY - 35) + "px");
+        })
+        .on("mouseout", function(d) {
+            tooltip.transition()
+                .duration(500)
+                .style("opacity", 0);
+        })
         .transition()
         .attr("x", function(d) { return x0(d.state); })
-        .attr("y", function (d) { return y0(d.state) + y(d.value); })
+        .attr("y", function (d) { return y0(d.state) + getY(d.state)(d.value); })
         .attr("width", x.bandwidth())
-        .attr("height", function (d) { return height/5 - y(d.value); })
+        .attr("height", function (d) { return height/5 - getY(d.state)(d.value); })
         .attr("fill", function (d) {  return selectedColor(d.Id); });
 
     rectData.transition()
         .duration(500)
         .attr("x", function(d) { return x0(d.state); })
-        .attr("y", function (d) { return y0(d.state) + y(d.value); })
+        .attr("y", function (d) { return y0(d.state) + getY(d.state)(d.value); })
         .attr("width", x.bandwidth())
-        .attr("height", function (d) { return height/5 - y(d.value); })
+        .attr("height", function (d) { return height/5 - getY(d.state)(d.value); })
         .attr("fill", function (d) {  return selectedColor(d.Id); });
 }
 
-function drawMap(selector) {
-    var svg = d3.select(selector).append("svg");
+function drawMap() {
+    var svg = d3.select("#chart_location").append("svg");
     svg.attr("width", 600);
     svg.attr("height", 350);
     svg.attr("viewBox", "0 0 600 350");
@@ -165,3 +192,29 @@ function convertRegion(region) {
             break;
     }
 }
+
+function toolTipTextMap(d, data) {
+    var text = d["campaign"];
+    var campaign = metaData.filter(function(d2) {return d2.CampaignID == d.Id})[0];
+    
+    if(selectedMapDataType == "Open Rate") {
+        text += '<br/>' + d.value  + " Openings";
+    }
+
+    if(selectedMapDataType == "Click Rate") {
+        text += '<br/>' + d.value  + " Clicks";
+    }
+
+    if(selectedMapDataType == "Open Rate" || selectedMapDataType == "Click Rate")
+        text += "<br/>("+ (d.value/campaign.Mails * 100).toPrecision(2) + "% of all)";
+
+    if(selectedMapDataType == "Reading Duration") {
+        text += d["campaign"] + "<br/> " + selectedMapDataType + ": " + d.value + "s";
+    }
+
+    return text;
+}
+
+d3.selectAll("#mapType").on("change", function(){
+    addMapData();
+});

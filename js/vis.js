@@ -38,7 +38,7 @@ function drawTable(selector, data) {
     var table = d3.select(selector).append('table');
     
     var columns = ["Name", "Send date"];
-    // append the header row
+
     table.append('tr')
         .selectAll('th')
         .data(columns)
@@ -46,7 +46,6 @@ function drawTable(selector, data) {
         .append('th')
         .text(function (column) { return column; });
 
-    // create a row for each object in the data
     var rows = table.selectAll('tr.data')
         .data(data)
         .enter()
@@ -55,7 +54,6 @@ function drawTable(selector, data) {
         .on("click", function(d) { selectCampaign(d, selector)})
         .classed("data", true);
 
-    // create a cell in each row for each column
     var cells = rows.selectAll('td')
         .data(function (row) {
             return [row["Name"], row["Send date"].format("YYYY-MM-DD hh:mm")]
@@ -80,9 +78,17 @@ function updateBars() {
                     .filter(function(d){ return d.key == m.CampaignID}).map(function(d) { 
                         return d3.sum(d.values, function(d2){ return d2.value; })/m["Mails"] * 100
                     })[0],
+                "Openings": openings
+                    .filter(function(d){ return d.key == m.CampaignID}).map(function(d) { 
+                        return d3.sum(d.values, function(d2){ return d2.value; })
+                    })[0],
                 "Click Rate": clicks
                     .filter(function(d){ return d.key == m.CampaignID}).map(function(d) { 
                         return d3.sum(d.values, function(d2){ return d2.value; })/m["Mails"] * 100
+                    })[0],
+                "Clicks": clicks
+                    .filter(function(d){ return d.key == m.CampaignID}).map(function(d) { 
+                        return d3.sum(d.values, function(d2){ return d2.value; })
                     })[0],
                 "Reading Duration": readTime
                     .filter(function(d){ return d.key == m.CampaignID}).map(function(d) { 
@@ -97,7 +103,6 @@ function updateBars() {
         height = +svg.attr("height") - margin.top - margin.bottom,
         g = svg.select("g");
 
-
     var barwidth = width - 65;
     var y0 = d3.scaleBand()
         .rangeRound([0, height])
@@ -106,6 +111,8 @@ function updateBars() {
         .padding(0.05);
     var x = d3.scaleLinear()
         .rangeRound([barwidth, 0]);
+    var xReading = d3.scaleLinear()
+        .rangeRound([barwidth, 0]);
 
     var keys = ["Open Rate", "Click Rate", "Reading Duration"];
 
@@ -113,6 +120,13 @@ function updateBars() {
     y1.domain(data.map(function (d) { return d.Campaign; })).rangeRound([0, y0.bandwidth()]);
 
     x.domain([0, d3.max(data, function (d) { return d3.max(keys, function (key) { return d[key]; }); })]).nice();
+    xReading.domain([0, 10]).nice();
+    var getX = function(d) {
+        if(d.key == "Reading Duration")
+            return xReading;
+        else
+            return x;
+    }
 
     var gdata = g.select("g.data")
         .selectAll("g")
@@ -123,7 +137,9 @@ function updateBars() {
         .attr("transform", function (d) { return "translate(0," + y1(d.Campaign) + ")"; });
     gdata.transition()
         .attr("transform", function (d) { return "translate(0," + y1(d.Campaign) + ")"; });
-    
+
+    var tooltip = d3.select("body").select("div.tooltip");
+
     var rectData = g.select("g.data")
         .selectAll("g")
         .selectAll("rect")
@@ -137,14 +153,27 @@ function updateBars() {
         .attr("height", y1.bandwidth())
         .attr("fill", function (d) { return selectedColor(d.Id); })
         .on("click", function(d){ selectedMapDataType = d.key; updateBars(); addMapData();})
+        .on("mouseover", function(d) {
+            tooltip.transition()
+                .duration(200)
+                .style("opacity", 1);
+            tooltip.html(toolTipText(d, data))
+                .style("left", (d3.event.pageX + 10) + "px")
+                .style("top", (d3.event.pageY - 35) + "px");
+        })
+        .on("mouseout", function(d) {
+            tooltip.transition()
+                .duration(500)
+                .style("opacity", 0);
+        })
         .transition()
         .attr("width", function (d) { 
-            return barwidth - x(d.value); })
+            return barwidth - getX(d)(d.value); })
             
     rectData.transition()
         .attr("y", function (d) { return y0(d.key); })
         .attr("width", function (d) { 
-            return barwidth - x(d.value); })
+            return barwidth - getX(d)(d.value); })
         .attr("height", y1.bandwidth())
         .attr("fill", function (d) { return selectedColor(d.Id); })
 
@@ -158,7 +187,7 @@ function drawBars() {
     var svg = d3.select("#chart_performance").append("svg");
     svg.attr("width", 400);
     svg.attr("height", 200);
-    var margin = { top: 20, right: 20, bottom: 30, left: 100 },
+    var margin = { top: 5, right: 20, bottom: 30, left: 100 },
         width = +svg.attr("width") - margin.left - margin.right,
         height = +svg.attr("height") - margin.top - margin.bottom,
         g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
@@ -168,5 +197,25 @@ function drawBars() {
     g.append("g").attr("class", "legend");
 };
 
+function toolTipText(d, data) {
+    var text = "";
+    var campaign = data.filter(function(d2) {return d2.Id == d.Id})[0];
+    if(d.key == "Open Rate" || d.key == "Click Rate")
+        text += d["campaign"] + "<br/> " + d.key + ": " + d.value.toPrecision(2);
+
+    if(d.key == "Open Rate") {
+        text += '%<br/>(' + campaign["Openings"]  + " Openings)";
+    }
+
+    if(d.key == "Click Rate") {
+        text += '%<br/>(' + campaign["Clicks"]  + " Clicks)";
+    }
+
+    if(d.key == "Reading Duration") {
+        text += d["campaign"] + "<br/> " + d.key + ": " + d.value.toPrecision(2) + "s";
+    }
+
+    return text;
+}
 
 

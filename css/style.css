@@ -25,10 +25,14 @@
     margin-bottom: 25px;
 }
 
-.viscontainer p, .intro p, .campaigncontainer table {
+.viscontainer p, .intro p, .campaigncontainer p, .campaigncontainer table {
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     font-size: 14px;
     color: #808080;
+}
+
+.campaigncontainer table {
+    font-size: 13px;
 }
 
 #chart_performance .axis .domain {
@@ -80,4 +84,5 @@
   pointer-events: none;
   background-color: white;
   border: #000 1px solid;
+  opacity: 0;
 }

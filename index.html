@@ -10,13 +10,17 @@
 </head>
 
 <body>
-    <div id="container" align="center" style="width:1000px;margin-left: auto;margin-right: auto;margin-top:50px">
+    <div id="container" align="center" style="width:1000px;margin-left: auto;margin-right: auto;margin-top:10px">
         <div class="campaigncontainer">
             <h2>Campaign Index</h2>
+            <p>List with all the campaigns available for comparing.
+                <br />Select two campaigns to compare.</p>
             <div id="chart_table"></div>
         </div>
         <div class="viscontainer big">
             <h2>Scatterplot</h2>
+            <p>Here you see a performance overview of all campaigns.
+                <br />Hover for more information.</p>
             <div id="chart_timeline"></div>
         </div>
         <div style="clear: both;"></div>
@@ -27,26 +31,27 @@
                 Sed vel consequat felis. Nunc non erat nisi. Cras magna magna, dignissim sit amet placerat luctus, fringilla
                 quis lectus. Quisque risus elit, sodales vitae arcu at, maximus imperdiet sapien. Suspendisse pellentesque
                 maximus felis. Donec dapibus ex vitae urna aliquet consequat. Nullam pellentesque lacinia arcu at sodales.
-                Integer imperdiet maximus pulvinar. Vivamus a ullamcorper ligula. Duis a libero sagittis ante suscipit ornare.
-                Nullam gravida euismod arcu, in placerat magna dignissim sit amet.</p>
+                Integer imperdiet maximus pulvinar. Vivamus a ullamcorper ligula.</p>
         </div>
-        <div class="viscontainer big">
+        <div class="viscontainer big" style="height: 320px;">
             <h2>Performance Indicators</h2>
             <p>Performance comparison of the selected newsletters.
                 <br />Hover for more information.</p>
             <div id="chart_performance"></div>
         </div>
         <div style="clear: both;"></div>
-        <div align="left" style="width:auto;position: relative;align-content: center; margin-top: 20px;height:400px">
+        <div align="left" style="width:auto;position: relative;align-content: center;height:400px">
             <div style="margin-top: 0px">&nbsp;</div>
             <div style="width:400px;align-content: center;text-align: center; top:0px; position: absolute" class="viscontainer">
                 <h2>Location of Recipients</h2>
                 <p>Mapping of locations and number of recipients.
-                    <br>Hover for more information.</p>
+                    <br>Hover for more information.<br><br>
+                    relative to <input type="radio" name="mapType" id="mapType" value="region" checked /> region <input type="radio" name="mapType" id="mapType" value="all" /> all</p>
             </div>
             <div id="chart_location" style="width: 600px; margin-left:auto;margin-right: auto; margin-top: 50px; height:350px"></div>
         </div>
     </div>
+    <div class="tooltip"></div>
 
     <script src="js/vis.js"></script>
     <script src="js/map.js"></script>

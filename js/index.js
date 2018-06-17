@@ -51,16 +51,16 @@ function startup() {
                 .rollup(function(v) { return d3.mean(v, function(d) { return +d.ReadTime}); })
                 .entries(data.filter(function(d){ return d.Event == "opening" && d.ReadTime != "NULL"}));
 
-            drawTable("#chart_table", tableData.slice(0, 12)); 
+            drawTable("#chart_table", tableData.slice(0, 10)); 
             drawBars();
-            drawMap("#chart_location"); 
+            drawMap(); 
 
             selectedCampaigns.push(tableData[0]["Id"]);
             selectedCampaigns.push(tableData[1]["Id"]);
 
             updateTable("#chart_table");
             updateBars();
-            addMapData("#chart_location");
+            addMapData();
             drawScatterPlot();
         });
     });
