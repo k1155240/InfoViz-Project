@@ -136,6 +136,10 @@ function updateScatterPlot() {
         .attr("r", function (d) {
             return selectedCampaigns.includes(d["Id"]) ? 10 : 6
         })
+        .style("stroke", function (d) {
+            return color(d.Name);
+        })
+        .style("fill-opacity", 0.4)
         .style("fill", function (d) {
             return color(d.Name);
         })
