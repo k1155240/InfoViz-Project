@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Report</title>
+</head>
+<body>
+<h1>Report</h1>
+<h2>Dataset</h2>
+<ul>
+    <li>Meta-Data of Newsletter Campaign<br>
+        - ID, Time of Sending, Sent Mails</li>
+
+    <li>Behavioural Data (All include Send ID and Mail ID)<br>
+        - Openings - Time, Location (based on IP)<br>
+        - Read Times - Duration (up to 10 seconds)<br>
+        - Clicks - Time, Link ID, Location (based on IP)</li>
+</ul>
+
+<h3>Meta-Data</h3>
+<img src="img/dataset_image.png" alt="Meta-Data">
+<h3>Behaviour Data</h3>
+<img src="img/dataset_image2.png" alt="Behaviour-Data">
+<h2>Tasks</h2>
+<ul>
+    <li>Goal<br>
+    - The user can analyse the behavior of newsletter subscribers to optimise the future newsletter model.
+    </li>
+    <li>Interaction<br>
+    - select newsletters to compare with the relevant key performance indicators.</li>
+</ul>
+<h2>Dashboard</h2>
+The dashboard consists of 4 visualizations (a list of all campaigns with color coding, a scatter plot, grouped bar charts and a location visualization):
+<img src="img/dashboard.png" alt="Dashboard">
+
+<h2>Implementation</h2>
+
+
+<h2>Limitations</h2>
+Our solution can handle just a small number of campaigns (13 campaigns in our example dataset), if there were a higher amount we would have to provide some kind of a preselection, e.g. selecting a time-range.
+
+<h2>Answer the tasks</h2>
+<ul>
+    <li>The user can select up to two newsletter campaigns.</li>
+    <li>The user can view a scatter plot showing the pair of <em>Click Rate</em> and <em>Open Rate</em> for all campaigns, where the two selected ones are highlighted.</li>
+    <li>The user can compare performance indicators with bar charts for <em>Open  Rate</em>, <em>Click Rate</em> and <em>Reading Duration</em>.</li>
+    <li>The user can view location dependencies of all performance indicators by a map which shows all indicators mapped to the number of recipients of capitals, one the one hand relative to the region or to the whole country.</li>
+</ul>
+
+<h2>Findings/Insights</h2>
+<ul>
+    <li>The bar charts on the map where sometimes very small, as Vienna had the largest number as capital city, therefore we decided to let the user switch between the whole country and the regional.</li>
+    <li>The map seams to be one of the more interesting visualization, e.g. by comparising campaign 5 and 6, campaign 6 seams to be better everywhere in the bar charts, but the map shows that the click rate in Tirol was very much better for campaign 5.</li>
+</ul>
+<h2>Conclusion</h2>
+<ul>
+    <li></li>
+</ul>
+</body>
+</html>
