@@ -51,7 +51,7 @@ function startup() {
                 .rollup(function(v) { return d3.mean(v, function(d) { return +d.ReadTime}); })
                 .entries(data.filter(function(d){ return d.Event == "opening" && d.ReadTime != "NULL"}));
 
-            drawTable("#chart_table", tableData.slice(0, 10)); 
+            drawTable("#chart_table", tableData.slice(0, 13)); 
             drawBars();
             drawMap(); 
 
