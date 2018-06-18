@@ -79,6 +79,9 @@ function updateScatterPlot() {
         .attr("cx", function(d) { return xScale(x(d)); })
         .attr("cy", function(d) { return yScale(y(d)); })
         .on("mouseover", function(d) {
+            d3.select(this).transition()
+                .duration(200)
+                .style("fill-opacity", 1);
             tooltip.transition()
                 .duration(200)
                 .style("opacity", 1);
@@ -88,14 +91,18 @@ function updateScatterPlot() {
                 .style("top", (d3.event.pageY - 35) + "px");
         })
         .on("mouseout", function(d) {
-            tooltip.transition()
+            d3.select(this).transition()
+                .duration(200)
+                .style("fill-opacity", 0.4);
+            tooltip
+                .transition()
                 .duration(500)
                 .style("opacity", 0);
         })
         .transition()
         .attr("r",  function(d) { return selectedCampaigns.includes(d["Id"]) ? 10 : 5})
         .style("stroke", function(d) { return color(d.Name); })
-        .style("fill-opacity", "0.4")
+        .style("fill-opacity", 0.4)
         .style("fill", function(d) { return color(d.Name); })
     
     plot.transition()
