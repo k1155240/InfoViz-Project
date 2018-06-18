@@ -10,23 +10,26 @@
 </head>
 
 <body>
-    <div id="container" align="center" style="width:1500px;margin-left: auto;margin-right: auto;margin-top:10px">
+    <div id="container" align="center" style="width:1500px;margin-left: auto;margin-right: auto;margin-top:50px">
         <div class="intro">
             <h1>Newsletter Visualization</h1>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam sed scelerisque turpis, et tempus magna. Quisque
-                eget cursus nulla, sit amet gravida ex. Vestibulum maximus magna mauris, dictum aliquam metus consequat a.
-                Sed vel consequat felis. Nunc non erat nisi. Cras magna magna, dignissim sit amet placerat luctus, fringilla
-                quis lectus. Quisque risus elit, sodales vitae arcu at, maximus imperdiet sapien. Suspendisse pellentesque
-                maximus felis. Donec dapibus ex vitae urna aliquet consequat. Nullam pellentesque lacinia arcu at sodales.
-                Integer imperdiet maximus pulvinar. Vivamus a ullamcorper ligula.</p>
+            <p>To visualize and compare the newsletter data you can select up to two newsletter campains in <b>Campain index</b>.
+                Click on the list entry for the compain which shell be compared and click again to remove the selection.</p>
+            <p>The <b>Scatterplot</b> shows the pair of <em>Click Rate</em> and <em>Open Rate</em> for all compains.
+                The selected campains are highlighted here by bigger circles.</p>
+                <p>You can compare some <b>Performance Indicators</b> with bar charts. The <em>Open  Rate</em>, <em>Click Rate</em> and <em>Reading Duration</em>
+                    are shown here with grouped bar charts for the selected campains.</p>
+                <p>On the <b>Location of Recipients</b> map you can see the same performance indifactors mapped to the number of recipients of capitals.
+                    The bar charts can be build relative to the region or relative to the whole country. You can change the <b>Performance Indicator</b>
+                    by clicking on another of the bar charts.</p>
         </div>
-        <div class="campaigncontainer">
+        <div class="campaigncontainer" style="margin-left: 60px">
             <h2>Campaign Index</h2>
             <p>List with all the campaigns available for comparing.
                 <br />Select two campaigns to compare.</p>
             <div id="chart_table"></div>
         </div>
-        <div class="viscontainer big">
+        <div class="viscontainer big" style="margin-left: -30px">
             <h2>Scatterplot</h2>
             <p>Here you see a performance overview of all campaigns.
                 <br />Hover for more information.</p>
@@ -44,7 +47,7 @@
             <p>Mapping of locations and number of recipients.
                 <br>Hover for more information.<br><br>
                     relative to <input type="radio" name="mapType" id="mapType" value="region" checked /> region <input type="radio" name="mapType" id="mapType" value="all" /> all</p>
-            <div id="chart_location" style="width: 600px; margin-left:auto;margin-right: auto; margin-top: 50px; height:350px"></div>
+            <div id="chart_location" style="width: 600px; margin-left:auto;margin-right: auto; margin-top: -50px; height:350px"></div>
         </div>
     </div>
     <div class="tooltip"></div>
