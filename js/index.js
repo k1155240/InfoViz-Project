@@ -57,6 +57,8 @@ function startup() {
 
             selectedCampaigns.push(tableData[0]["Id"]);
             selectedCampaigns.push(tableData[1]["Id"]);
+            selectedCampaignsNames.push(tableData[0]["Name"]);
+            selectedCampaignsNames.push(tableData[1]["Name"]);
 
             updateTable("#chart_table");
             updateBars();

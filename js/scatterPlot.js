@@ -67,7 +67,7 @@ function updateScatterPlot() {
         xScale = d3.scaleLinear().range([0, width]).domain([0, d3.max(data, x)+10]);
     var y = function(d) { return d["Click Rate"];},
         yScale = d3.scaleLinear().range([height, 0]).domain([0, d3.max(data, y)+1]);
-    var color = d3.scaleOrdinal(d3.schemeCategory10);
+  //  var color = d3.scaleOrdinal(d3.schemeCategory10);
 
     var plot = svg.selectAll(".dot")
         .data(data);
@@ -75,10 +75,8 @@ function updateScatterPlot() {
 
     plot.enter().append("circle")
         .attr("class", "dot")
-        .attr("r",  0.1)
         .attr("cx", function(d) { return xScale(x(d)); })
         .attr("cy", function(d) { return yScale(y(d)); })
-        .style("fill", function(d) { var col = selectedColor(d.Id); var stdCol = color(d.Name); return col === "" ? stdCol : col;}) 
         .on("mouseover", function(d) {
             tooltip.transition()
                 .duration(200)
@@ -94,10 +92,11 @@ function updateScatterPlot() {
                 .style("opacity", 0);
         })
         .transition()
-        .attr("r",  function(d) { return selectedCampaigns.includes(d["Id"]) ? 7 : 3.5})
-        .style("fill", function(d) { var col = selectedColor(d.Id); var stdCol = color(d.Name); return col === "" ? stdCol : col;}) 
+        .attr("r",  function(d) { return selectedCampaigns.includes(d["Id"]) ? 10 : 5})
+        .style("stroke", "none")
+        .style("fill", function(d) { return color(d.Name); })
     
     plot.transition()
-        .attr("r",  function(d) { return selectedCampaigns.includes(d["Id"]) ? 7 : 3.5})
-        .style("fill", function(d) { var col = selectedColor(d.Id); var stdCol = color(d.Name); return col === "" ? stdCol : col;}) 
+        .attr("r",  function(d) { return selectedCampaigns.includes(d["Id"]) ? 10 : 5})
+        .style("fill", function(d) { return color(d.Name); })
 }

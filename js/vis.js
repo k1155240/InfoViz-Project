@@ -1,13 +1,21 @@
 var selectedCampaigns = [];
+var selectedCampaignsNames = [];
 var selectedMapDataType = "Open Rate";
+var colors = ["#a0d1ce","#f5cc63","#d5cb74","#909749","#dce2c6","#1d949c","#aed1e7","#db8f77","#e53f25","#ecb16d","#f8c7cd","#ef677b","#751231","#582c29","#c4aa87","#b3b1a5"];
 
 function selectedColor(id) {
-    if(selectedCampaigns[0] == id)
-        return "#f7f296";
+    if(selectedCampaigns[0] == id) {
+        return color(selectedCampaignsNames[0]);
+    }
     else if(selectedCampaigns[1] == id)
-        return "#8d91bb";
-    else 
+        return color(selectedCampaignsNames[1]);
+    else
         return "";
+}
+
+function color(name) {
+    var num = parseInt(name.replace(/^\D+/g,''))-1;
+    return colors[num];
 }
 
 function updateTable(selector) {
@@ -23,9 +31,11 @@ function updateTable(selector) {
 function selectCampaign(d, selector) {
     if(selectedCampaigns.includes(d["Id"])) {
         selectedCampaigns.splice(selectedCampaigns.indexOf(d["Id"]), 1);
+        selectedCampaignsNames.splice(selectedCampaignsNames.indexOf(d["Name"]), 1);
     }
     else if (selectedCampaigns.length < 2) {
         selectedCampaigns.push(d["Id"]);
+        selectedCampaignsNames.push(d["Name"]);
     }
 
     updateTable(selector);
@@ -37,7 +47,7 @@ function selectCampaign(d, selector) {
 function drawTable(selector, data) {
     var table = d3.select(selector).append('table');
     
-    var columns = ["Name", "Send date"];
+    var columns = ["", "Name", "Send date"];
 
     table.append('tr')
         .selectAll('th')
@@ -56,11 +66,17 @@ function drawTable(selector, data) {
 
     var cells = rows.selectAll('td')
         .data(function (row) {
-            return [row["Name"], row["Send date"].format("YYYY-MM-DD hh:mm")]
+            return [color(row["Name"]), row["Name"], row["Send date"].format("YYYY-MM-DD hh:mm")];
         })
         .enter()
         .append('td')
-        .text(function (d) { return d; });
+        .text(function (d) { return d; })
+        .style('background-color', function(d){
+            return /^#[0-9A-F]{6}$/i.test(d) ? d : null;
+        })
+        .style('font-size', function(d){
+            return /^#[0-9A-F]{6}$/i.test(d) ? 0 : 10;
+        });
 }
 
 
@@ -218,5 +234,3 @@ function toolTipText(d, data) {
 
     return text;
 }
-
-
