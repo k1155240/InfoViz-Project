@@ -65,6 +65,10 @@ function addMapData() {
         .range([25, 20, 15, 75, 140, 120, 210, 160, 70]);
 
     var mapType = d3.select('input[name="mapType"]:checked').node().value;
+
+    console.log(selectedMapDataType);
+    d3.select("span").text(selectedMapDataType);
+
     var y = d3.scaleLinear()
         .rangeRound([height/5, 0])
         .domain([0, d3.max(data, function (d) { return d3.max(keys, function (key) { return d[key]; }); })])

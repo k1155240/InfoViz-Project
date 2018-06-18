@@ -30,7 +30,8 @@ function drawScatterPlot() {
         .attr("class", "label")
         .attr("x", width)
         .attr("y", height + 30)
-        .attr("font-size", "12")
+        .attr("font-size", "10")
+        .attr("font-family", "Verdana, Geneva, Tahoma, sans-serif")
         .style("text-anchor", "end")
         .text("Open Rate (%)");
 
@@ -44,7 +45,8 @@ function drawScatterPlot() {
         .attr("x", 0)
         .attr("y", -40)
         .attr("dy", ".71em")
-        .attr("font-size", "12")
+        .attr("font-size", "10")
+        .attr("font-family", "Verdana, Geneva, Tahoma, sans-serif")
         .style("text-anchor", "end")
         .text("Click Rate (%)");
 
@@ -67,7 +69,6 @@ function updateScatterPlot() {
         xScale = d3.scaleLinear().range([0, width]).domain([0, d3.max(data, x)+10]);
     var y = function(d) { return d["Click Rate"];},
         yScale = d3.scaleLinear().range([height, 0]).domain([0, d3.max(data, y)+1]);
-  //  var color = d3.scaleOrdinal(d3.schemeCategory10);
 
     var plot = svg.selectAll(".dot")
         .data(data);

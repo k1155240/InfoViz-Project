@@ -1,7 +1,7 @@
 var selectedCampaigns = [];
 var selectedCampaignsNames = [];
 var selectedMapDataType = "Open Rate";
-var colors = ["#a0d1ce","#f5cc63","#d5cb74","#909749","#dce2c6","#1d949c","#aed1e7","#db8f77","#e53f25","#ecb16d","#f8c7cd","#ef677b","#751231","#582c29","#c4aa87","#b3b1a5"];
+var colors = ["#a0d1ce","#f5cc63","#B2BC71","#909749","#dce2c6","#1d949c","#70ADBE","#db8f77","#e53f25","#ecb16d","#f8c7cd","#ef677b","#751231","#582c29","#c4aa87","#b3b1a5"];
 
 function selectedColor(id) {
     if(selectedCampaigns[0] == id) {
@@ -133,6 +133,7 @@ function updateBars() {
     var keys = ["Open Rate", "Click Rate", "Reading Duration"];
 
     y0.domain(keys);
+
     y1.domain(data.map(function (d) { return d.Campaign; })).rangeRound([0, y0.bandwidth()]);
 
     x.domain([0, d3.max(data, function (d) { return d3.max(keys, function (key) { return d[key]; }); })]).nice();
@@ -150,8 +151,7 @@ function updateBars() {
 
     gdata.exit().remove();
     gdata.enter().append("g")
-        .attr("transform", function (d) { return "translate(0," + y1(d.Campaign) + ")"; });
-    gdata.transition()
+        .transition()
         .attr("transform", function (d) { return "translate(0," + y1(d.Campaign) + ")"; });
 
     var tooltip = d3.select("body").select("div.tooltip");
@@ -168,8 +168,6 @@ function updateBars() {
         .attr("width", function (d) { return 0; })
         .attr("height", y1.bandwidth())
         .attr("fill", function (d) { return selectedColor(d.Id); })
-        .style("cursor", "pointer")
-        .on("click", function(d){ selectedMapDataType = d.key; updateBars(); addMapData();})
         .on("mouseover", function(d) {
             tooltip.transition()
                 .duration(200)
@@ -197,7 +195,10 @@ function updateBars() {
     g.select("g.axis")
         .call(d3.axisLeft(y0))
         .selectAll("text")
-        .attr("text-decoration", function(d, i) { return d == selectedMapDataType  ? "underline" : "none";});
+        .style("font-size", function(d) { return d == selectedMapDataType ? "11px" : "10px"; })
+        .style("font-weight", function(d) { return d == selectedMapDataType  ? "bold" : "normal";})
+        .style("cursor", "pointer")
+        .on("click", function(d){ selectedMapDataType = d; updateBars(); addMapData();});
 }
 
 function drawBars() {
