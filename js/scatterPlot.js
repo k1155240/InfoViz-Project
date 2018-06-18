@@ -30,7 +30,8 @@ function drawScatterPlot() {
         .attr("class", "label")
         .attr("x", width)
         .attr("y", height + 30)
-        .attr("font-size", "12")
+        .attr("font-size", "10")
+        .attr("font-family", "Verdana, Geneva, Tahoma, sans-serif")
         .style("text-anchor", "end")
         .text("Open Rate (%)");
 
@@ -44,7 +45,8 @@ function drawScatterPlot() {
         .attr("x", 0)
         .attr("y", -40)
         .attr("dy", ".71em")
-        .attr("font-size", "12")
+        .attr("font-size", "10")
+        .attr("font-family", "Verdana, Geneva, Tahoma, sans-serif")
         .style("text-anchor", "end")
         .text("Click Rate (%)");
 
@@ -52,8 +54,13 @@ function drawScatterPlot() {
 }
 
 function updateScatterPlot() {
-    var data = metaData.map(function(d) {
-        return {Id: d["CampaignID"], Name: d["Name"], "Open Rate": d["Openings"]/d["Mails"] * 100, "Click Rate": d["Clicks"]/d["Mails"] * 100}
+    var data = metaData.map(function (d) {
+        return {
+            Id: d["CampaignID"],
+            Name: d["Name"],
+            "Open Rate": d["Openings"] / d["Mails"] * 100,
+            "Click Rate": d["Clicks"] / d["Mails"] * 100
+        }
     });
 
     var margin = {top: 20, right: 20, bottom: 40, left: 50},
@@ -63,40 +70,77 @@ function updateScatterPlot() {
     var svg = d3.select("#chart_timeline")
         .select("svg").select("g");
 
-    var x = function(d) { return d["Open Rate"];},
-        xScale = d3.scaleLinear().range([0, width]).domain([0, d3.max(data, x)+10]);
-    var y = function(d) { return d["Click Rate"];},
-        yScale = d3.scaleLinear().range([height, 0]).domain([0, d3.max(data, y)+1]);
-  //  var color = d3.scaleOrdinal(d3.schemeCategory10);
+    var x = function (d) {
+            return d["Open Rate"];
+        },
+        xScale = d3.scaleLinear().range([0, width]).domain([0, d3.max(data, x) + 10]);
+    var y = function (d) {
+            return d["Click Rate"];
+        },
+        yScale = d3.scaleLinear().range([height, 0]).domain([0, d3.max(data, y) + 1]);
 
     var plot = svg.selectAll(".dot")
         .data(data);
     var tooltip = d3.select("body").select("div.tooltip");
 
+    d3.selection.prototype.moveToFront = function() {
+        return this.each(function(){
+            this.parentNode.appendChild(this);
+        });
+    };
+
     plot.enter().append("circle")
         .attr("class", "dot")
-        .attr("cx", function(d) { return xScale(x(d)); })
-        .attr("cy", function(d) { return yScale(y(d)); })
-        .on("mouseover", function(d) {
+        .attr("cx", function (d) {
+            return xScale(x(d));
+        })
+        .attr("cy", function (d) {
+            return yScale(y(d));
+        })
+        .on("mouseover", function (d) {
+            var sel = d3.select(this);
+            sel.transition()
+                .duration(200)
+                .style("fill-opacity", 1);
+            sel.moveToFront();
             tooltip.transition()
                 .duration(200)
                 .style("opacity", 1);
-            tooltip.html(d["Name"] + "<br/> (" + x(d).toPrecision(2) + '%' 
+            tooltip.html(d["Name"] + "<br/> (" + x(d).toPrecision(2) + '%'
                 + ", " + y(d).toPrecision(2) + "%)")
                 .style("left", (d3.event.pageX + 10) + "px")
                 .style("top", (d3.event.pageY - 35) + "px");
         })
-        .on("mouseout", function(d) {
-            tooltip.transition()
+        .on("mouseout", function (d) {
+            d3.select(this).transition()
+                .duration(200)
+                .style("fill-opacity", 0.4);
+            tooltip
+                .transition()
                 .duration(500)
                 .style("opacity", 0);
         })
         .transition()
-        .attr("r",  function(d) { return selectedCampaigns.includes(d["Id"]) ? 10 : 5})
-        .style("stroke", "none")
-        .style("fill", function(d) { return color(d.Name); })
-    
+        .attr("r", function (d) {
+            return selectedCampaigns.includes(d["Id"]) ? 10 : 6
+        })
+        .style("stroke", function (d) {
+            return color(d.Name);
+        })
+        .style("fill-opacity", 0.4)
+        .style("fill", function (d) {
+            return color(d.Name);
+        })
+
     plot.transition()
-        .attr("r",  function(d) { return selectedCampaigns.includes(d["Id"]) ? 10 : 5})
-        .style("fill", function(d) { return color(d.Name); })
+        .attr("r", function (d) {
+            return selectedCampaigns.includes(d["Id"]) ? 10 : 6
+        })
+        .style("stroke", function (d) {
+            return color(d.Name);
+        })
+        .style("fill-opacity", 0.4)
+        .style("fill", function (d) {
+            return color(d.Name);
+        })
 }
