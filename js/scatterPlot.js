@@ -94,7 +94,8 @@ function updateScatterPlot() {
         })
         .transition()
         .attr("r",  function(d) { return selectedCampaigns.includes(d["Id"]) ? 10 : 5})
-        .style("stroke", "none")
+        .style("stroke", function(d) { return color(d.Name); })
+        .style("fill-opacity", "0.4")
         .style("fill", function(d) { return color(d.Name); })
     
     plot.transition()
