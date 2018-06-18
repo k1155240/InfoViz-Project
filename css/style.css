@@ -82,11 +82,15 @@
 }
 
 .tooltip {
-  position: absolute;
-  width: auto;
-  height: auto;
-  pointer-events: none;
-  background-color: white;
-  border: #000 1px solid;
-  opacity: 0;
+    position: absolute;
+    width: auto;
+    height: auto;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 10px;
+    pointer-events: none;
+    background-color: white;
+    border: #999 1px solid;
+    padding: 5px;
+    border-radius: 5px;
+    opacity: 0;
 }
