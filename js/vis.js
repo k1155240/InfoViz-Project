@@ -1,7 +1,7 @@
 var selectedCampaigns = [];
 var selectedCampaignsNames = [];
 var selectedMapDataType = "Open Rate";
-var colors = ["#a0d1ce","#f5cc63","#B2BC71","#909749","#dce2c6","#1d949c","#70ADBE","#db8f77","#e53f25","#ecb16d","#f8c7cd","#ef677b","#751231","#582c29","#c4aa87","#b3b1a5"];
+var colors = ["#a0d1ce","#f5cc63","#B2BC71","#909749","#dce2c6","#1d949c","#70ADBE","#db8f77","#e53f25","#ecb16d","#f8c7cd","#ef677b","#751231","#834743","#c4aa87","#b3b1a5"];
 
 function selectedColor(id) {
     if(selectedCampaigns[0] == id) {
