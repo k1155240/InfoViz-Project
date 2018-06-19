@@ -131,7 +131,6 @@ function addMapData() {
         .attr("fill", function (d) {  return selectedColor(d.Id); });
 
     rectData.transition()
-        .duration(500)
         .attr("x", function(d) { return x0(d.state); })
         .attr("y", function (d) { return y0(d.state) + getY(d.state)(d.value); })
         .attr("width", x.bandwidth())
