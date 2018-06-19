@@ -4,17 +4,22 @@
     <meta charset="UTF-8">
     <title>Report</title>
 </head>
-<body>
+<body style="margin-left: 100px;margin-top: 50px">
 <h1>Report</h1>
+Group Members: Stefan Wolfsteiner, Lisa Kritzinger, Hiuwai Chan
+
 <h2>Dataset</h2>
+For this project we are visualizing tracking data of email newsletter campaigns. The data was provided by a company at which one of the group members wworks.<br/>
+The dataset consits of two different parts. The actual Behavioural Data and the Meta Data of the newsletter campaigns.<br/>
+All data is completly anonymized, no linking to the actual recipients is possible.
 <ul>
     <li>Meta-Data of Newsletter Campaign<br>
-        - ID, Time of Sending, Sent Mails</li>
-
+        - ID, Name, Time of Sending, Sent Mails, Total Clicks and Openings</li>
+        <br/>
     <li>Behavioural Data (All include Send ID and Mail ID)<br>
-        - Openings - Time, Location (based on IP)<br>
+        - Openings - Location (based on IP)<br>
         - Read Times - Duration (up to 10 seconds)<br>
-        - Clicks - Time, Link ID, Location (based on IP)</li>
+        - Clicks - Link ID, Location (based on IP)</li>
 </ul>
 
 <h3>Meta-Data</h3>
@@ -23,18 +28,21 @@
 <img src="img/dataset_image2.png" alt="Behaviour-Data">
 <h2>Tasks</h2>
 <ul>
-    <li>Goal<br>
-    - The user can analyse the behavior of newsletter subscribers to optimise the future newsletter model.
-    </li>
-    <li>Interaction<br>
-    - select newsletters to compare with the relevant key performance indicators.</li>
+    <li>The user can see all the newsletter campaigns in the datset.</li>
+    <ul><li>Proposed solution: Show a table with all campaigns.</li></ul><br />
+    <li>The user can quickly evaluate the performances of all the campaigns in the dataset and compare them.</li>
+    <ul><li>Proposed solution: Show a scatterplot comparing the Click Rate and the Open Rate for all the campaigns.</li></ul><br />
+    <li>The user can compare two selected newletter campaigns by their key performance indicators.</li>
+    <ul><li>Proposed solution: Two campaigns can be selected in the table and grouped bar charts then show the Open Rate, Click Rate and Reading Duration.</li></ul><br />
+    <li>The user can also compare the performance indicators of the selected campaigns for different regions.</li>
+    <ul><li>Proposed solution: A performance indicator can be selected in the grouped bar charts<br /> and this indicator is then displayed for each region on top of a map.</li></ul>
 </ul>
-<h2>Dashboard</h2>
-The dashboard consists of 4 visualizations (a list of all campaigns with color coding, a scatter plot, grouped bar charts and a location visualization):
-<img src="img/dashboard.png" alt="Dashboard">
-
 <h2>Implementation</h2>
-
+Here you can see the final result of our implementation:<br/><br/>
+<img src="img/dashboard.png" alt="Dashboard">
+><br/>
+Each visualisation (Table, Scatterplot, Grouped Bar Charts, Bar Charts on map) are implemented with d3.js.<br/> 
+All but the table are visualized with svg elements. The table is build with HTML, but also using d3.js. <br />
 
 <h2>Limitations</h2>
 Our solution can handle just a small number of campaigns (13 campaigns in our example dataset), if there were a higher amount we would have to provide some kind of a preselection, e.g. selecting a time-range.
