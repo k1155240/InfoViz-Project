@@ -1,6 +1,14 @@
 function drawScatterPlot() {
     var data = metaData.map(function(d) {
-        return {Id: d["CampaignID"], Name: d["Name"], "Open Rate": d["Openings"]/d["Mails"] * 100, "Click Rate": d["Clicks"]/d["Mails"] * 100}
+        return {Id: d["CampaignID"], Name: d["Name"], 
+            "Open Rate": openings
+                .filter(function(d_2){ return d_2.key == d.CampaignID}).map(function(d_2) { 
+                    return d3.sum(d_2.values, function(d_3){ return d_3.value; })/d["Mails"] * 100
+                })[0], 
+            "Click Rate": clicks
+            .filter(function(d_2){ return d_2.key == d.CampaignID}).map(function(d_2) { 
+                return d3.sum(d_2.values, function(d_3){ return d_3.value; })/d["Mails"] * 100
+            })[0]}
     });
 
     var margin = {top: 20, right: 20, bottom: 40, left: 50},
@@ -54,13 +62,16 @@ function drawScatterPlot() {
 }
 
 function updateScatterPlot() {
-    var data = metaData.map(function (d) {
-        return {
-            Id: d["CampaignID"],
-            Name: d["Name"],
-            "Open Rate": d["Openings"] / d["Mails"] * 100,
-            "Click Rate": d["Clicks"] / d["Mails"] * 100
-        }
+    var data = metaData.map(function(d) {
+        return {Id: d["CampaignID"], Name: d["Name"], 
+            "Open Rate": openings
+                .filter(function(d_2){ return d_2.key == d.CampaignID}).map(function(d_2) { 
+                    return d3.sum(d_2.values, function(d_3){ return d_3.value; })/d["Mails"] * 100
+                })[0], 
+            "Click Rate": clicks
+            .filter(function(d_2){ return d_2.key == d.CampaignID}).map(function(d_2) { 
+                return d3.sum(d_2.values, function(d_3){ return d_3.value; })/d["Mails"] * 100
+            })[0]}
     });
 
     var margin = {top: 20, right: 20, bottom: 40, left: 50},
@@ -83,11 +94,6 @@ function updateScatterPlot() {
         .data(data);
     var tooltip = d3.select("body").select("div.tooltip");
 
-    d3.selection.prototype.moveToFront = function() {
-        return this.each(function(){
-            this.parentNode.appendChild(this);
-        });
-    };
 
     plot.enter().append("circle")
         .attr("class", "dot")
@@ -102,7 +108,6 @@ function updateScatterPlot() {
             sel.transition()
                 .duration(200)
                 .style("fill-opacity", 1);
-            sel.moveToFront();
             tooltip.transition()
                 .duration(200)
                 .style("opacity", 1);

@@ -159,7 +159,7 @@ function updateBars() {
     var rectData = g.select("g.data")
         .selectAll("g")
         .selectAll("rect")
-        .data(function (d) { return keys.map(function (key) { return { key: key, value: d[key], Id: d.Id, campaign: d.Campaign }; }); })
+        .data(function (d) { return keys.map(function (key) { return { key: key, value: d[key], Id: d.Id, campaign: d.Campaign, data: d }; }); })
     
     rectData.exit().remove();
     rectData.enter().append("rect")
@@ -222,11 +222,11 @@ function toolTipText(d, data) {
         text += d["campaign"] + "<br/> " + d.key + ": " + d.value.toPrecision(2);
 
     if(d.key == "Open Rate") {
-        text += '%<br/>(' + campaign["Openings"]  + " Openings)";
+        text += '%<br/>(' + d.data["Openings"]  + " Openings)";
     }
 
     if(d.key == "Click Rate") {
-        text += '%<br/>(' + campaign["Clicks"]  + " Clicks)";
+        text += '%<br/>(' + d.data["Clicks"]  + " Clicks)";
     }
 
     if(d.key == "Reading Duration") {
