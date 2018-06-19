@@ -53,27 +53,44 @@ Another file <em>map.js</em> consists of the implementation for the location bas
 The map itself is a svg image, which is loaded from the server. We got it here: https://simplemaps.com/resources/svg-at<br>
 For the color coding a predefined color array is used, where each color is used for a certain campaign. 15 colors are defined, so the dashboard works for up to 15 campaigns.
 
+<h2>Installation</h2>
+Installation: Just run "npm install" and "npm start". Make sure node.js is installed.
+Or just visit: <a href="https://infovis2018.azurewebsites.net/">https://infovis2018.azurewebsites.net/</a>
 
 <h2>Limitations</h2>
-Our solution can handle just a small number of campaigns (13 campaigns in our example dataset), if there were a higher amount we would have to provide some kind of a preselection, e.g. selecting a time-range.
+Our solution can handle just a small number of campaigns (13 campaigns in our example dataset). The table would also need paging and maybe also sorting.<br/>
+The colors for the table and scatterplot could be removed completly. Only the selected campaigns need to be colored.<br/>
+With too many campaigns, the scatterplot would be problematic too.<br/>
+Very small values for the performance indicators make it hard to get the tooltip when hovering.<br/>
+When the bar charts on the map get to small, they vanish completly. After seeing this we though that it might actually be a good thing, but it was not intended.<br/>
 
-<h2>Answer the tasks</h2>
+<h2>Answers to the tasks</h2>
 <ul>
-    <li>The user can select up to two newsletter campaigns.</li>
-    <li>The user can view a scatter plot showing the pair of <em>Click Rate</em> and <em>Open Rate</em> for all campaigns, where the two selected ones are highlighted.</li>
-    <li>The user can compare performance indicators with bar charts for <em>Open  Rate</em>, <em>Click Rate</em> and <em>Reading Duration</em>.</li>
-    <li>The user can view location dependencies of all performance indicators by a map which shows all indicators mapped to the number of recipients of capitals, one the one hand relative to the region or to the whole country.</li>
+    <li>The user can see all the newsletter campaigns in the datset.</li>
+    <ul><li>As we proposed above, we show a table with all campaigns.</li></ul><br />
+    <li>The user can quickly evaluate the performances of all the campaigns in the dataset and compare them.</li>
+    <ul><li>The user can view a scatter plot showing the pair of <em>Click Rate</em> and <em>Open Rate</em> for all campaigns, where the two selected ones are highlighted.</li></ul><br />
+    <li>The user can compare two selected newletter campaigns by their key performance indicators.</li>
+    <ul><li>The user can select up to two newsletter campaigns in the table.</li>
+    <li>The user can compare performance indicators of the selected campaigns with bar charts for <em>Open  Rate</em>, <em>Click Rate</em> and <em>Reading Duration</em>.</li></ul><br>
+    <li>The user can also compare the performance indicators of the selected campaigns for different regions.</li>
+    <ul><li>The user can view location dependencies of all performance indicators by a map which shows all indicators mapped to the number of recipients of capitals, one the one hand relative to the region or to the whole country.</li></ul>
 </ul>
 
 <h2>Findings/Insights</h2>
 <ul>
-    <li>The bar charts on the map where sometimes very small, as Vienna had the largest number as capital city, therefore we decided to let the user switch between the whole country and the regional.</li>
-    <li>The map seams to be one of the more interesting visualization, e.g. by comparising campaign 5 and 6, campaign 6 seams to be better everywhere in the bar charts, but the map shows that the click rate in Tirol was very much better for campaign 5.</li>
+    <li>The bar charts on the map where sometimes very small, as Vienna had the largest number as capital city, therefore we decided to let the user switch between the whole country and the regional view.</li>
+    <li>The map seems to be one of the more interesting visualization, e.g. by comparising campaign 5 and 6, campaign 6 seems to be better everywhere in the bar charts, but the map shows that the click rate in Tirol was very much better for campaign 5.</li>
+    <li>The scatter plot shows, that higher open rates do not always result in higher click rates.</li>
+    <li>The reading duration seems to be high for all the campaigns. Maybe the ten second limit for the max readtime tracking is not high enough.</li>
 </ul>
 <h2>Conclusion</h2>
 <ul>
-    <li>The limitation of diverse colors forces to limit the amount of diverse data as well (especially seen in the scatter plot).</li>
-    <li>The location data depends very often on the number of citizens in a certain location. After we saw that in the map visualization we added the possibility to switch between absolute and regional relative data.</li>
+    <li>D3 was very nice to implement once you get used to it.</li>
+    <li>But a major problem were the different d3 versions. Search results on google always finds examples for older versions.</li>
+    <li>This was especially true for the transitions!</li>
+    <li>We also found that there is a huge number of plugins, which we couldn't use. For future projects it is worth investigating them.</li>
+    <li>But overall the development experience was very good and we are pleased with the result.</li>
 </ul>
 </body>
 </html>
