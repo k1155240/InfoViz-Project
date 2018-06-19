@@ -34,7 +34,12 @@ The dashboard consists of 4 visualizations (a list of all campaigns with color c
 <img src="img/dashboard.png" alt="Dashboard">
 
 <h2>Implementation</h2>
-
+The implementation is separated in 4 .js files. The <em>index.js</em> file contains the binding to the dataset and defines the data structure.<br>
+The <em>vis.js</em> contains the implementation of the list of campaigns, here also the field for the currently selected campaigns is defined.<br>
+The bar charts for the performance indicators is defined in this file as well.<br>
+A separate <em>scatterPlot.js</em> js file consists of the implementation for the scatterplott.<br>
+Another file <em>map.js</em> consists of the implementation for the location based visualization.<br>
+For the color coding a predefined color array is used, where each color is used for a certain campaign. 15 colors are defined, so the dashboard works for up to 15 campaigns.
 
 <h2>Limitations</h2>
 Our solution can handle just a small number of campaigns (13 campaigns in our example dataset), if there were a higher amount we would have to provide some kind of a preselection, e.g. selecting a time-range.
@@ -54,7 +59,8 @@ Our solution can handle just a small number of campaigns (13 campaigns in our ex
 </ul>
 <h2>Conclusion</h2>
 <ul>
-    <li></li>
+    <li>The limitation of diverse colors forces to limit the amount of diverse data as well (especially seen in the scatter plot).</li>
+    <li>The location data depends very often on the number of citizens in a certain location. After we saw that in the map visualization we added the possibility to switch between absolute and regional relative data.</li>
 </ul>
 </body>
 </html>
